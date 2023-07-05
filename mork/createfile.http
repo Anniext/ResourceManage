@@ -1,0 +1,9 @@
+POST http://127.0.0.1:5500/api/resource/create/
+Content-Type: application/json
+
+{
+  "name": "爱坤坤",
+  "size": 5555,
+  "type": "image/png",
+  "file_path": "/path"
+}

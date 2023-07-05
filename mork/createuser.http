@@ -1,0 +1,11 @@
+POST http://127.0.0.1:5500/api/user/create/
+Content-Type: application/json
+
+{
+  "name": "爱坤坤",
+  "real_name": "坤坤",
+  "user_pwd": "fdasfadsf",
+  "is_super": 1,
+  "mobile": "12345678901",
+  "email": "dsafas"
+}

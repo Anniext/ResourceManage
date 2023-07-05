@@ -1,0 +1,10 @@
+PUT http://127.0.0.1:5500/api/unit/update/3
+Content-Type: application/json
+
+{
+  "name": "真爱坤",
+  "level": 8888888,
+  "is_super": 88888,
+  "parent_id": 888888,
+  "address": "sadfsadfadsfads"
+}
