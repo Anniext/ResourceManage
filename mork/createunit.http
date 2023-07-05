@@ -1,0 +1,10 @@
+POST http://127.0.0.1:5500/api/unit/create/
+Content-Type: application/json
+
+{
+  "name": "爱坤坤",
+  "level": 12,
+  "is_super": 0,
+  "parent_id": 126,
+  "address": "北京市海淀区"
+}
