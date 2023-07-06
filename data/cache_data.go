@@ -7,10 +7,9 @@ import (
 )
 
 var (
-	CacheFile        *FileMap
-	CacheUnit        *UnitMap
-	CacheUser        *UserMap
-	CacheBackendUser *BackendUserMap
+	CacheFile *FileMap
+	CacheUnit *UnitMap
+	CacheUser *UserMap
 )
 
 func SystemDataInit() {
@@ -18,7 +17,6 @@ func SystemDataInit() {
 	CacheFile = NewFileMap()
 	CacheUnit = NewUnitMap()
 	CacheUser = NewUserMap()
-	CacheBackendUser = NewBackendUserMap()
 
 	// 加载数据库数据
 	err := GetFileData()
@@ -33,11 +31,6 @@ func SystemDataInit() {
 	if err != nil {
 		return
 	}
-	err = GetBackendUserData()
-	if err != nil {
-		return
-	}
-
 }
 
 func GetFileData() (err error) {
@@ -58,14 +51,6 @@ func GetUnitData() (err error) {
 
 func GetUserData() (err error) {
 	_, err = http.Get("http://127.0.0.1" + config.Configs.AppPort + "/api/cache/LoadUserData")
-	if err != nil {
-		log.Println("file_data请求失败:", err)
-	}
-	return
-}
-
-func GetBackendUserData() (err error) {
-	_, err = http.Get("http://127.0.0.1" + config.Configs.AppPort + "/api/cache/LoadBackendUserData")
 	if err != nil {
 		log.Println("file_data请求失败:", err)
 	}
