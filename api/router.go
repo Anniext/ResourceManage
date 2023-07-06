@@ -33,11 +33,11 @@ func SetResource(r *RouterGroup) {
 }
 
 func SetUnit(r *RouterGroup) {
-	r.POST("/create", UnitManaegr.Create)
-	r.GET("/get/:id", UnitManaegr.Get)
-	r.GET("/list/:delete_id", UnitManaegr.List)
-	r.PUT("/update/:id", UnitManaegr.Update)
-	r.DELETE("/delete/:id", UnitManaegr.Delete)
+	r.POST("/create", UnitManager.Create)
+	r.GET("/get/:id", UnitManager.Get)
+	r.GET("/list/:delete_id", UnitManager.List)
+	r.PUT("/update/:id", UnitManager.Update)
+	r.DELETE("/delete/:id", UnitManager.Delete)
 }
 
 func SetUser(r *RouterGroup) {
@@ -49,12 +49,16 @@ func SetUser(r *RouterGroup) {
 }
 
 func (r *RouterGroup) SetCache() {
-	r.GET("/LoadFileData", CacheManeger.LoadFileData)
-	r.GET("/LoadUnitData", CacheManeger.LoadUnitData)
-	r.GET("/LoadUserData", CacheManeger.LoadUnitData)
+	r.GET("/LoadFileData", CacheManager.LoadFileData)
+	r.GET("/LoadUnitData", CacheManager.LoadUnitData)
+	r.GET("/LoadUserData", CacheManager.LoadUnitData)
 }
 
 func (r *RouterGroup) SetHttp() {
 	r.POST("/upload", HttpManager.Upload)
 	r.GET("/download", HttpManager.Download)
+}
+
+func (r *RouterGroup) SetToken() {
+	r.POST("/login", TokenManager.Login)
 }

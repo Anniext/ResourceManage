@@ -32,14 +32,20 @@ type CacheInterface interface {
 	LoadUserData(c *gin.Context)
 }
 
+type TokenInterface interface {
+	SetToken()
+	Login(c *gin.Context)
+}
+
 var (
 	router       *gin.Engine
 	api          *RouterGroup
-	CacheManeger CacheInterface
 	FileManager  RouterManager
-	UnitManaegr  RouterManager
+	UnitManager  RouterManager
 	UserManager  RouterManager
+	CacheManager CacheInterface
 	HttpManager  HttpServerManager
+	TokenManager TokenInterface
 )
 
 func init() {
@@ -58,9 +64,10 @@ func RouterGroupInit() {
 	})
 	FileManager = &RouterGroup{api.Group("/resource")}
 	HttpManager = &RouterGroup{api.Group("/resource")}
-	CacheManeger = &RouterGroup{api.Group("/cache")}
-	UnitManaegr = &RouterGroup{api.Group("/unit")}
+	CacheManager = &RouterGroup{api.Group("/cache")}
+	UnitManager = &RouterGroup{api.Group("/unit")}
 	UserManager = &RouterGroup{api.Group("/user")}
+	TokenManager = &RouterGroup{api.Group("/token")}
 }
 
 func Serviceinit() {
@@ -102,10 +109,11 @@ func StartDownloadServer() {
 
 func GroupInit() {
 	FileManager.SetRouter()
-	UnitManaegr.SetRouter()
+	UnitManager.SetRouter()
 	UserManager.SetRouter()
-	CacheManeger.SetCache()
+	CacheManager.SetCache()
 	HttpManager.SetHttp()
+	TokenManager.SetToken()
 }
 
 func SqlserverInit() (db *gorm.DB) {

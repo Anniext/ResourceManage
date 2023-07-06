@@ -17,7 +17,7 @@ type AvtUser struct {
 }
 
 func LoadUserData(db *gorm.DB) (UserDataList []*AvtUser) {
-	err := db.Raw("SELECT * FROM sys_user_backend ORDER BY id").Scan(&UserDataList).Error
+	err := db.Raw("SELECT * FROM sys_user_backend_temp ORDER BY id").Scan(&UserDataList).Error
 	if err != nil {
 		log.Println("sys_user_backend表数据加载错误：", err)
 	}
@@ -41,7 +41,7 @@ func (m *UserMap) Set(bu *AvtUser) {
 
 func CreateUser(user *AvtUser, db *gorm.DB) error {
 	user.Status = 1
-	if err := db.Table("sys_user_backend").Create(user).Error; err != nil {
+	if err := db.Table("sys_user_backend_temp").Create(user).Error; err != nil {
 		return err
 	}
 	return nil
@@ -49,7 +49,7 @@ func CreateUser(user *AvtUser, db *gorm.DB) error {
 
 func GetUser(id string, db *gorm.DB) (*AvtUser, error) {
 	var user AvtUser
-	if err := db.Table("sys_user_backend").Where("id = ?", id).First(&user).Error; err != nil {
+	if err := db.Table("sys_user_backend_temp").Where("id = ?", id).First(&user).Error; err != nil {
 		return nil, err
 	}
 	return &user, nil
@@ -57,7 +57,7 @@ func GetUser(id string, db *gorm.DB) (*AvtUser, error) {
 
 func GetUserList(db *gorm.DB) ([]AvtUser, error) {
 	var user []AvtUser
-	if err := db.Table("sys_user_backend").Find(&user).Error; err != nil {
+	if err := db.Table("sys_user_backend_temp").Find(&user).Error; err != nil {
 		return nil, err
 	}
 	return user, nil
@@ -76,7 +76,7 @@ func UpdateUser(id string, user *AvtUser, db *gorm.DB) error {
 	existingUser.Status = user.Status
 	existingUser.Mobile = user.Mobile
 	existingUser.Email = user.Email
-	if err := db.Table("sys_user_backend").Save(existingUser).Error; err != nil {
+	if err := db.Table("sys_user_backend_temp").Save(existingUser).Error; err != nil {
 		return err
 	}
 
@@ -84,7 +84,7 @@ func UpdateUser(id string, user *AvtUser, db *gorm.DB) error {
 }
 
 func DeleteUser(id string, db *gorm.DB) error {
-	if err := db.Table("sys_user_backend").Where("id = ?", id).Delete(&AvtUser{}).Error; err != nil {
+	if err := db.Table("sys_user_backend_temp").Where("id = ?", id).Delete(&AvtUser{}).Error; err != nil {
 		return err
 	}
 	return nil

@@ -20,7 +20,8 @@ type AvtFile struct {
 	UpdateTime string `gorm:"column:update_time;not null" json:"update_time"`
 	IsDelete   int    `gorm:"column:is_delete;not null" json:"is_delete"`
 	UnitId     int    `gorm:"column:unit_id" json:"unit_id"`
-	Status     string `gorm:"column:status;not null" json:"status"`
+	Status     int    `gorm:"column:status;not null" json:"status"`
+	File       string `gorm:"column:file;not null" json:"file"`
 }
 
 func LoadFileData(db *gorm.DB) (fileDataList []*AvtFile) {
@@ -50,7 +51,8 @@ func CreateFile(file *AvtFile, db *gorm.DB) error {
 	file.CreateTime = time.Now().Format("2006-01-02 15:04:05")
 	file.UpdateTime = time.Now().Format("2006-01-02 15:04:05")
 	file.IsDelete = 0
-	file.Status = "1"
+	file.Status = 1
+	file.File = file.Name + "." + file.Type
 	if err := db.Table("avt_file").Create(file).Error; err != nil {
 		return err
 	}
@@ -90,13 +92,12 @@ func UpdateFile(id string, file *AvtFile, db *gorm.DB) error {
 		return err
 	}
 	existingFile.Name = file.Name
-	existingFile.Size = file.Size
-	existingFile.Type = file.Type
 	existingFile.FilePath = file.FilePath
 	existingFile.UpdateTime = time.Now().Format("2006-01-02 15:04:05")
 	existingFile.IsDelete = file.IsDelete
 	existingFile.Status = file.Status
 	existingFile.UnitId = file.UnitId
+	existingFile.File = file.Name + "." + existingFile.Type
 	if err := db.Table("avt_file").Save(existingFile).Error; err != nil {
 		return err
 	}
@@ -146,7 +147,8 @@ func UploadFile(handler *multipart.FileHeader, f multipart.File, fileData *AvtFi
 	fileData.CreateTime = time.Now().Format("2006-01-02 15:04:05")
 	fileData.UpdateTime = time.Now().Format("2006-01-02 15:04:05")
 	fileData.IsDelete = 0
-	fileData.Status = "1"
+	fileData.Status = 1
+	fileData.File = handler.Filename
 	if err := db.Table("avt_file").Create(fileData).Error; err != nil {
 		log.Println(err)
 		return err
@@ -189,7 +191,7 @@ func DowloadFile(handler *multipart.FileHeader, f multipart.File, fileData *AvtF
 	fileData.CreateTime = time.Now().Format("2006-01-02 15:04:05")
 	fileData.UpdateTime = time.Now().Format("2006-01-02 15:04:05")
 	fileData.IsDelete = 0
-	fileData.Status = "1"
+	fileData.Status = 1
 	if err := db.Table("avt_file").Create(fileData).Error; err != nil {
 		log.Println(err)
 		return err
