@@ -30,6 +30,7 @@ type CacheInterface interface {
 	LoadFileData(c *gin.Context)
 	LoadUnitData(c *gin.Context)
 	LoadUserData(c *gin.Context)
+	LoadBackendUserData(c *gin.Context)
 }
 
 type TokenInterface interface {

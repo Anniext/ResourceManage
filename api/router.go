@@ -52,6 +52,7 @@ func (r *RouterGroup) SetCache() {
 	r.GET("/LoadFileData", CacheManager.LoadFileData)
 	r.GET("/LoadUnitData", CacheManager.LoadUnitData)
 	r.GET("/LoadUserData", CacheManager.LoadUnitData)
+	r.GET("/LoadBackendUserData", CacheManager.LoadBackendUserData)
 }
 
 func (r *RouterGroup) SetHttp() {

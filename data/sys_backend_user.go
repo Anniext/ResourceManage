@@ -1,5 +1,10 @@
 package data
 
+import (
+	"gorm.io/gorm"
+	"log"
+)
+
 type SysBackendUser struct {
 	Id            int    `gorm:"column:id;auto" json:"id"`
 	RealName      string `gorm:"column:real_name;not null" json:"real_name"`
@@ -17,4 +22,33 @@ type SysBackendUser struct {
 	Percentage    int    `gorm:"column:percentage;not null" json:"percentage"`
 	Quota         int    `gorm:"column:quota;not null" json:"quota"`
 	KdxfLoginName string `gorm:"column:kdxf_login_name;not null" json:"kdxf_login_name"`
+}
+
+func LoadBackendUserData(db *gorm.DB) (UserDataList []*SysBackendUser) {
+	err := db.Raw("SELECT * FROM sys_backend_user ORDER BY id").Scan(&UserDataList).Error
+	if err != nil {
+		log.Println("sys_backend_user表数据加载错误：", err)
+	}
+	count := int64(len(UserDataList))
+	if count > 0 {
+		log.Println("sys_backend_user表缓存数据加载成功!")
+		for _, user := range UserDataList {
+			CacheBackendUser.Set(user)
+		}
+	} else {
+		log.Println("没有数据！")
+	}
+	return
+}
+
+func (m *BackendUserMap) Set(bu *SysBackendUser) {
+	m.lock.Lock()
+	m.data[bu.UserName] = bu
+	m.lock.Unlock()
+}
+
+func (m *BackendUserMap) Get(name string) *SysBackendUser {
+	m.lock.RLock()
+	defer m.lock.RUnlock()
+	return m.data[name]
 }
