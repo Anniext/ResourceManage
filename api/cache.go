@@ -23,3 +23,9 @@ func (r *RouterGroup) LoadUserData(c *gin.Context) {
 	data.LoadUserData(db)
 	c.JSON(200, nil)
 }
+
+func (r *RouterGroup) LoadBackendUserData(c *gin.Context) {
+	db := c.MustGet("db").(*gorm.DB)
+	data.LoadBackendUserData(db)
+	c.JSON(200, nil)
+}
