@@ -15,13 +15,15 @@ type SysBackendUser struct {
 	Mobile        string `gorm:"column:mobile;not null" json:"mobile"`
 	Email         string `gorm:"column:email;not null" json:"email"`
 	Avatar        string `gorm:"column:avatar;not null" json:"avatar"`
-	UserYype      int    `gorm:"column:user_type;not null" json:"user_type"`
-	OperatorId    int    `gorm:"column:operator_id;not null" json:"operator_id"`
-	ParentId      int    `gorm:"column:parent_id;not null" json:"parent_id"`
-	ParentRoute   string `gorm:"column:parent_route;not null" json:"parent_route"`
-	Percentage    int    `gorm:"column:percentage;not null" json:"percentage"`
-	Quota         int    `gorm:"column:quota;not null" json:"quota"`
-	KdxfLoginName string `gorm:"column:kdxf_login_name;not null" json:"kdxf_login_name"`
+	UserType      int    `gorm:"column:user_type" json:"user_type"` //1:管理员
+	OperatorId    int    `gorm:"column:operator_id" json:"operator_id"`
+	ParentId      int    `gorm:"column:parent_id" json:"parent_id"`
+	ParentRoute   string `gorm:"column:parent_route" json:"parent_route"`
+	Percentage    int    `gorm:"column:percentage" json:"percentage"`
+	Quota         int    `gorm:"column:quota" json:"quota"`
+	KdxfLoginName string `gorm:"column:kdxf_login_name" json:"kdxf_login_name"`
+	Expires       int    `gorm:"column:expires" json:"expires"`      // 有效期
+	Level         int    `gorm:"column:level;not null" json:"level"` //账号等级
 }
 
 func LoadBackendUserData(db *gorm.DB) (UserDataList []*SysBackendUser) {

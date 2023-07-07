@@ -36,6 +36,7 @@ type CacheInterface interface {
 type TokenInterface interface {
 	SetToken()
 	Login(c *gin.Context)
+	Authentication(c *gin.Context)
 }
 
 var (

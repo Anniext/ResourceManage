@@ -5,7 +5,6 @@ import (
 	"ResourceManage/token"
 	"ResourceManage/utils"
 	"github.com/gin-gonic/gin"
-	"log"
 	"net/http"
 )
 
@@ -16,7 +15,7 @@ func (r *RouterGroup) Login(c *gin.Context) {
 		// 错误信息400,把error发送
 		return
 	}
-	if !CheckUser(user) {
+	if !CheckUser(&user) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "用户名或密码错误"})
 		// 错误信息401,把error发送
 		return
@@ -32,13 +31,29 @@ func (r *RouterGroup) Login(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"msg": "Successful!", "token": Token})
 }
 
+func (r *RouterGroup) Authentication(c *gin.Context) {
+	tk := c.Request.Header.Get("Authorization")
+	if tk == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "token为空"})
+		return
+	}
+	result := utils.ParseJwt(tk)
+	if result == nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "token无效"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"msg": result})
+}
+
 // CheckUser 密码鉴权
-func CheckUser(user utils.UserInfo) bool {
+func CheckUser(user *utils.UserInfo) bool {
 	logUserPwd := user.Password
 	logUserPwdMd5 := utils.StringMd5(logUserPwd)
-	userPwd := data.CacheBackendUser.Get(user.Username).UserPwd
-	log.Println(userPwd)
+	sysUser := data.CacheBackendUser.Get(user.Username)
+	userPwd := sysUser.UserPwd
 	if logUserPwdMd5 == userPwd {
+		user.Prmisss.Expires = sysUser.Expires
+		user.Prmisss.Level = sysUser.Level
 		return true
 	} else {
 		return false

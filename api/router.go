@@ -62,4 +62,5 @@ func (r *RouterGroup) SetHttp() {
 
 func (r *RouterGroup) SetToken() {
 	r.POST("/login", TokenManager.Login)
+	r.GET("/authentication", TokenManager.Authentication)
 }
