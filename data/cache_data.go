@@ -64,7 +64,7 @@ func GetUserData() (err error) {
 }
 
 func GetBackendUserData() (err error) {
-	_, err = http.Get("http://127.0.0.1" + config.Configs.AppPort + "/api/cache/LoadUserData")
+	_, err = http.Get("http://127.0.0.1" + config.Configs.AppPort + "/api/cache/LoadBackendUserData")
 	if err != nil {
 		log.Println("file_data请求失败:", err)
 	}
