@@ -2,7 +2,7 @@ package services
 
 import (
 	"ResourceManage/config"
-	"github.com/gin-contrib/cors"
+	"ResourceManage/dao"
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -29,7 +29,7 @@ type CacheInterface interface {
 	SetCache()
 	LoadFileData(c *gin.Context)
 	LoadUnitData(c *gin.Context)
-	LoadUserData(c *gin.Context)
+	//LoadUserData(c *gin.Context)
 	LoadBackendUserData(c *gin.Context)
 }
 
@@ -55,14 +55,11 @@ func init() {
 }
 
 func RouterGroupInit() {
-	//gin.SetMode(gin.ReleaseMode)
 	router = gin.Default()
-	db := SqlserverInit()
-	router.Use(cors.Default())
+	router.Use(DevCors()) //使用自定义的跨域中间件
 	api = &RouterGroup{router.Group("/api")}
 	api.Use(func(c *gin.Context) {
-		c.Set("db", db)
-		c.Next()
+
 	})
 	FileManager = &RouterGroup{api.Group("/resource")}
 	HttpManager = &RouterGroup{api.Group("/resource")}
@@ -73,10 +70,11 @@ func RouterGroupInit() {
 }
 
 func Serviceinit() {
-	GroupInit()              // 初始化路由
-	go StartMainServer()     // 启动主服务
-	go StartUploadServer()   // 启动上传服务
-	go StartDownloadServer() // 启动下载服务
+	dao.SetDefault(DevReturnDB()) //初始化数据服务
+	GroupInit()                   // 初始化路由
+	go StartMainServer()          // 启动主服务
+	go StartUploadServer()        // 启动上传服务
+	go StartDownloadServer()      // 启动下载服务
 }
 
 func StartMainServer() {
@@ -118,16 +116,10 @@ func GroupInit() {
 	TokenManager.SetToken()
 }
 
-func SqlserverInit() (db *gorm.DB) {
-	log.Println("mysql connection...", config.Configs.Dsn)
+func DevReturnDB() *gorm.DB {
 	db, err := gorm.Open(mysql.Open(config.Configs.Dsn), &gorm.Config{})
 	if err != nil {
 		log.Println("Failed to connect to database:", err)
-	} else {
-		log.Println("mysql connection successful!")
-	}
-	if err != nil {
-		panic("Failed to get underlying DB connection")
 	}
 	return db
 }

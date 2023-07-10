@@ -14,6 +14,7 @@ var (
 )
 
 func SystemDataInit() {
+
 	// 建立缓存数据
 	CacheFile = NewFileMap()
 	CacheUnit = NewUnitMap()
@@ -29,10 +30,10 @@ func SystemDataInit() {
 	if err != nil {
 		return
 	}
-	err = GetUserData()
-	if err != nil {
-		return
-	}
+	//err = GetUserData()
+	//if err != nil {
+	//	return
+	//}
 	err = GetBackendUserData()
 	if err != nil {
 		return

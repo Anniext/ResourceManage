@@ -18,8 +18,8 @@ type UserInfo struct {
 }
 
 type Permissions struct {
-	Level   int `json:"level"`
-	Expires int `json:"expires"`
+	Level   int64 `json:"level"`
+	Expires int64 `json:"expires"`
 }
 
 type CustomClaims struct {

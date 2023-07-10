@@ -17,11 +17,11 @@ func StringMd5(s string) string {
 	return hashString
 }
 
-func GetLevel(i interface{}) (int, string) {
+func GetLevel(i interface{}) (int64, string) {
 	err, ok := i.(string)
 	if ok {
 		return -1, err
 	}
-	level := int(i.(jwt.MapClaims)["Prmiss"].(map[string]interface{})["level"].(float64)) // 获取token的level
+	level := int64(i.(jwt.MapClaims)["Prmiss"].(map[string]interface{})["level"].(float64)) // 获取token的level
 	return level, ""
 }

@@ -1,9 +1,9 @@
 package main
 
 import (
-	"ResourceManage/api"
 	"ResourceManage/config"
 	"ResourceManage/data"
+	"ResourceManage/gin"
 	"time"
 )
 

@@ -1,22 +1,12 @@
 package data
 
 import (
+	"ResourceManage/model"
 	"gorm.io/gorm"
 	"log"
 )
 
-type AvtUser struct {
-	Id       int    `gorm:"column:id;auto" json:"id"`
-	Name     string `gorm:"column:name;not null" json:"name"`
-	RealName string `gorm:"column:real_name;not null" json:"real_name"`
-	UserPwd  string `gorm:"column:user_pwd;not null" json:"user_pwd"`
-	IsSuper  int    `gorm:"column:is_super;not null" json:"is_super"`
-	Status   int    `gorm:"column:status;not null" json:"status"`
-	Mobile   string `gorm:"column:mobile;not null" json:"mobile"`
-	Email    string `gorm:"column:email;not null" json:"email"`
-}
-
-func LoadUserData(db *gorm.DB) (UserDataList []*AvtUser) {
+func LoadUserData(db *gorm.DB) (UserDataList []*model.SysBackendUser) {
 	err := db.Raw("SELECT * FROM sys_user_backend_temp ORDER BY id").Scan(&UserDataList).Error
 	if err != nil {
 		log.Println("sys_user_backend表数据加载错误：", err)
@@ -33,13 +23,13 @@ func LoadUserData(db *gorm.DB) (UserDataList []*AvtUser) {
 	return
 }
 
-func (m *UserMap) Set(bu *AvtUser) {
+func (m *UserMap) Set(bu *model.SysBackendUser) {
 	m.lock.Lock()
-	m.data[bu.Id] = bu
+	m.data[bu.ID] = bu
 	m.lock.Unlock()
 }
 
-func CreateUser(user *AvtUser, db *gorm.DB) error {
+func CreateUser(user *model.SysBackendUser, db *gorm.DB) error {
 	user.Status = 1
 	if err := db.Table("sys_user_backend_temp").Create(user).Error; err != nil {
 		return err
@@ -47,29 +37,28 @@ func CreateUser(user *AvtUser, db *gorm.DB) error {
 	return nil
 }
 
-func GetUser(id string, db *gorm.DB) (*AvtUser, error) {
-	var user AvtUser
+func GetUser(id string, db *gorm.DB) (*model.SysBackendUser, error) {
+	var user model.SysBackendUser
 	if err := db.Table("sys_user_backend_temp").Where("id = ?", id).First(&user).Error; err != nil {
 		return nil, err
 	}
 	return &user, nil
 }
 
-func GetUserList(db *gorm.DB) ([]AvtUser, error) {
-	var user []AvtUser
+func GetUserList(db *gorm.DB) ([]model.SysBackendUser, error) {
+	var user []model.SysBackendUser
 	if err := db.Table("sys_user_backend_temp").Find(&user).Error; err != nil {
 		return nil, err
 	}
 	return user, nil
 }
 
-func UpdateUser(id string, user *AvtUser, db *gorm.DB) error {
+func UpdateUser(id string, user *model.SysBackendUser, db *gorm.DB) error {
 	existingUser, err := GetUser(id, db)
 	if err != nil {
 		log.Println("GetUser err:", err)
 		return err
 	}
-	existingUser.Name = user.Name
 	existingUser.RealName = user.RealName
 	existingUser.UserPwd = user.UserPwd
 	existingUser.IsSuper = user.IsSuper
@@ -84,7 +73,7 @@ func UpdateUser(id string, user *AvtUser, db *gorm.DB) error {
 }
 
 func DeleteUser(id string, db *gorm.DB) error {
-	if err := db.Table("sys_user_backend_temp").Where("id = ?", id).Delete(&AvtUser{}).Error; err != nil {
+	if err := db.Table("sys_user_backend_temp").Where("id = ?", id).Delete(&model.SysBackendUser{}).Error; err != nil {
 		return err
 	}
 	return nil

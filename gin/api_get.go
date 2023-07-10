@@ -2,7 +2,6 @@ package services
 
 import (
 	"ResourceManage/data"
-	"ResourceManage/utils"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"log"
@@ -40,21 +39,14 @@ func UnitGetGroup(c *gin.Context) {
 	db := c.MustGet("db").(*gorm.DB)
 	//获取路由参数
 	id := c.Param("id")
-	level, errStr := utils.GetLevel(utils.GetJwtClaims(c)) //通过token获取level
-	if errStr != "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": errStr})
-		return
-	}
+
 	unit, err := data.GetUnit(id, db)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		// 错误信息500,把error发送
 		return
 	}
-	if unit.Level <= level {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Permission too low to delete"})
-		return
-	}
+
 	c.JSON(http.StatusOK, unit)
 }
 

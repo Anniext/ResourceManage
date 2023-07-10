@@ -1,14 +1,17 @@
 package data
 
-import "sync"
+import (
+	"ResourceManage/model"
+	"sync"
+)
 
 type UserMap struct {
-	data map[int]*AvtUser
+	data map[int64]*model.SysBackendUser
 	lock sync.RWMutex
 }
 
 func NewUserMap() *UserMap {
 	return &UserMap{
-		data: make(map[int]*AvtUser),
+		data: make(map[int64]*model.SysBackendUser),
 	}
 }

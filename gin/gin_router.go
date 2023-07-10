@@ -49,9 +49,10 @@ func SetUser(r *RouterGroup) {
 }
 
 func (r *RouterGroup) SetCache() {
+	r.Use(DevSqlDate())
 	r.GET("/LoadFileData", CacheManager.LoadFileData)
 	r.GET("/LoadUnitData", CacheManager.LoadUnitData)
-	r.GET("/LoadUserData", CacheManager.LoadUnitData)
+	//r.GET("/LoadUserData", CacheManager.LoadUnitData)
 	r.GET("/LoadBackendUserData", CacheManager.LoadBackendUserData)
 }
 

@@ -2,6 +2,7 @@ package services
 
 import (
 	"ResourceManage/data"
+	"ResourceManage/model"
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -24,7 +25,7 @@ type rangeBytes struct {
 
 func (r *RouterGroup) Upload(c *gin.Context) {
 	db := c.MustGet("db").(*gorm.DB)
-	var file data.AvtFile
+	var file model.AvtFile
 	//w := c.Writer
 	read := c.Request
 	f, handler, err := read.FormFile("file")

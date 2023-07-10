@@ -1,6 +1,7 @@
 package data
 
 import (
+	"ResourceManage/model"
 	"gorm.io/gorm"
 	"io"
 	"log"
@@ -10,48 +11,11 @@ import (
 	"time"
 )
 
-type AvtFile struct {
-	Id         int    `gorm:"column:id;auto" json:"id"`
-	Name       string `gorm:"column:name;not null" json:"name"`
-	Size       int    `gorm:"column:size;not null" json:"size"`
-	Type       string `gorm:"column:type;not null" json:"type"`
-	FilePath   string `gorm:"column:file_path;not null" json:"file_path"`
-	CreateTime string `gorm:"column:create_time;not null" json:"create_time"`
-	UpdateTime string `gorm:"column:update_time;not null" json:"update_time"`
-	IsDelete   int    `gorm:"column:is_delete;not null" json:"is_delete"`
-	UnitId     int    `gorm:"column:unit_id" json:"unit_id"`
-	Status     int    `gorm:"column:status;not null" json:"status"`
-	File       string `gorm:"column:file;not null" json:"file"`
-}
-
-func LoadFileData(db *gorm.DB) (fileDataList []*AvtFile) {
-	err := db.Raw("SELECT * FROM avt_file ORDER BY id").Scan(&fileDataList).Error
-	if err != nil {
-		log.Println("avt_file表数据加载错误：", err)
-	}
-	count := int64(len(fileDataList))
-	if count > 0 {
-		log.Println("avt_file表缓存数据加载成功!")
-		for _, file := range fileDataList {
-			CacheFile.Set(file)
-		}
-	} else {
-		log.Println("没有数据！")
-	}
-	return
-}
-
-func (m *FileMap) Set(bu *AvtFile) {
-	m.lock.Lock()
-	m.data[bu.Id] = bu
-	m.lock.Unlock()
-}
-
-func CreateFile(file *AvtFile, db *gorm.DB) error {
-	file.CreateTime = time.Now().Format("2006-01-02 15:04:05")
-	file.UpdateTime = time.Now().Format("2006-01-02 15:04:05")
-	file.IsDelete = 0
-	file.Status = 1
+func CreateFile(file *model.AvtFile, db *gorm.DB) error {
+	file.CreateTime = time.Now()
+	file.UpdateTime = time.Now()
+	file.IsDelete = "0"
+	file.Status = "1"
 	file.File = file.Name + "." + file.Type
 	if err := db.Table("avt_file").Create(file).Error; err != nil {
 		return err
@@ -59,16 +23,16 @@ func CreateFile(file *AvtFile, db *gorm.DB) error {
 	return nil
 }
 
-func GetFile(id string, db *gorm.DB) (*AvtFile, error) {
-	var file AvtFile
+func GetFile(id string, db *gorm.DB) (*model.AvtFile, error) {
+	var file model.AvtFile
 	if err := db.Table("avt_file").Where("id = ?", id).First(&file).Error; err != nil {
 		return nil, err
 	}
 	return &file, nil
 }
 
-func GetFileList(db *gorm.DB, delete_id string) ([]AvtFile, error) {
-	var files []AvtFile
+func GetFileList(db *gorm.DB, delete_id string) ([]model.AvtFile, error) {
+	var files []model.AvtFile
 	if delete_id == "0" {
 		if err := db.Table("avt_file").Find(&files).Error; err != nil {
 			return nil, err
@@ -85,7 +49,7 @@ func GetFileList(db *gorm.DB, delete_id string) ([]AvtFile, error) {
 	return files, nil
 }
 
-func UpdateFile(id string, file *AvtFile, db *gorm.DB) error {
+func UpdateFile(id string, file *model.AvtFile, db *gorm.DB) error {
 	existingFile, err := GetFile(id, db)
 	if err != nil {
 		log.Println("GetFile err:", err)
@@ -93,10 +57,10 @@ func UpdateFile(id string, file *AvtFile, db *gorm.DB) error {
 	}
 	existingFile.Name = file.Name
 	existingFile.FilePath = file.FilePath
-	existingFile.UpdateTime = time.Now().Format("2006-01-02 15:04:05")
+	existingFile.UpdateTime = time.Now()
 	existingFile.IsDelete = file.IsDelete
 	existingFile.Status = file.Status
-	existingFile.UnitId = file.UnitId
+	existingFile.UnitID = file.UnitID
 	existingFile.File = file.Name + "." + existingFile.Type
 	if err := db.Table("avt_file").Save(existingFile).Error; err != nil {
 		return err
@@ -106,13 +70,13 @@ func UpdateFile(id string, file *AvtFile, db *gorm.DB) error {
 }
 
 func DeleteFile(id string, db *gorm.DB) error {
-	if err := db.Table("avt_file").Where("id = ?", id).Delete(&AvtFile{}).Error; err != nil {
+	if err := db.Table("avt_file").Where("id = ?", id).Delete(&model.AvtFile{}).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
-func UploadFile(handler *multipart.FileHeader, f multipart.File, fileData *AvtFile, db *gorm.DB) error {
+func UploadFile(handler *multipart.FileHeader, f multipart.File, fileData *model.AvtFile, db *gorm.DB) error {
 	//path, _ := os.Getwd()
 
 	fstr := strings.Split(handler.Filename, ".")
@@ -141,13 +105,13 @@ func UploadFile(handler *multipart.FileHeader, f multipart.File, fileData *AvtFi
 		return err
 	}
 	fileData.Name = fname
-	fileData.Size = int(handler.Size)
+	fileData.Size = int64(handler.Size)
 	fileData.FilePath = "uploads/"
 	fileData.Type = ftype
-	fileData.CreateTime = time.Now().Format("2006-01-02 15:04:05")
-	fileData.UpdateTime = time.Now().Format("2006-01-02 15:04:05")
-	fileData.IsDelete = 0
-	fileData.Status = 1
+	fileData.CreateTime = time.Now()
+	fileData.UpdateTime = time.Now()
+	fileData.IsDelete = "0"
+	fileData.Status = "1"
 	fileData.File = handler.Filename
 	if err := db.Table("avt_file").Create(fileData).Error; err != nil {
 		log.Println(err)
@@ -156,7 +120,7 @@ func UploadFile(handler *multipart.FileHeader, f multipart.File, fileData *AvtFi
 	return nil
 }
 
-func DowloadFile(handler *multipart.FileHeader, f multipart.File, fileData *AvtFile, db *gorm.DB) error {
+func DowloadFile(handler *multipart.FileHeader, f multipart.File, fileData *model.AvtFile, db *gorm.DB) error {
 	//path, _ := os.Getwd()
 
 	fstr := strings.Split(handler.Filename, ".")
@@ -185,13 +149,13 @@ func DowloadFile(handler *multipart.FileHeader, f multipart.File, fileData *AvtF
 		return err
 	}
 	fileData.Name = fname
-	fileData.Size = int(handler.Size)
+	fileData.Size = int64(int(handler.Size))
 	fileData.FilePath = "uploads/"
 	fileData.Type = ftype
-	fileData.CreateTime = time.Now().Format("2006-01-02 15:04:05")
-	fileData.UpdateTime = time.Now().Format("2006-01-02 15:04:05")
-	fileData.IsDelete = 0
-	fileData.Status = 1
+	fileData.CreateTime = time.Now()
+	fileData.UpdateTime = time.Now()
+	fileData.IsDelete = "0"
+	fileData.Status = "1"
 	if err := db.Table("avt_file").Create(fileData).Error; err != nil {
 		log.Println(err)
 		return err

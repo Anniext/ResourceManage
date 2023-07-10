@@ -2,6 +2,7 @@ package services
 
 import (
 	"ResourceManage/data"
+	"ResourceManage/model"
 	"ResourceManage/utils"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -9,80 +10,81 @@ import (
 	"net/http"
 )
 
-func (r *RouterGroup) Create(c *gin.Context) {
+func (r *RouterGroup) Update(c *gin.Context) {
 	groupName := GetGroupName(r)
 	switch groupName {
 	case "resource":
-		FileCreateGroup(c)
+		FileUpdateGroup(c)
 	case "unit":
-		UnitCreateGroup(c)
+		UnitUpdateGroup(c)
 	case "user":
-		UserCreateGroup(c)
+		UserUpdateGroup(c)
 	default:
 		log.Println("Error group name", groupName)
 	}
 }
 
-func FileCreateGroup(c *gin.Context) {
+func FileUpdateGroup(c *gin.Context) {
 	db := c.MustGet("db").(*gorm.DB)
-	var file data.AvtFile
-	// 请求响应绑定File结构
+	id := c.Param("id")
+	var file model.AvtFile
 	if err := c.ShouldBind(&file); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		// 错误信息400,把error发送
 		return
 	}
-	//log.Println(r)
-	if err := data.CreateFile(&file, db); err != nil {
+	if err := data.UpdateFile(id, &file, db); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		// 错误信息500,把error发送
 		return
 	}
-	// 发送状态码200
-	c.JSON(http.StatusOK, "File created successfully")
+
+	c.JSON(http.StatusOK, gin.H{"message": "File updated successfully"})
 }
 
-func UnitCreateGroup(c *gin.Context) {
+func UnitUpdateGroup(c *gin.Context) {
 	db := c.MustGet("db").(*gorm.DB)
-	level, errStr := utils.GetLevel(utils.GetJwtClaims(c)) //通过token获取level
-	if errStr != "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": errStr})
-		return
-	}
-	var unit data.AvtUnit
-	// 请求响应绑定File结构
+	id := c.Param("id")
+
+	var unit model.AvtUnit
 	if err := c.ShouldBind(&unit); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		// 错误信息400,把error发送
+		return
+	}
+	level, errStr := utils.GetLevel(utils.GetJwtClaims(c)) //通过token获取level
+	if errStr != "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": errStr})
 		return
 	}
 	if unit.Level <= level {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Permission too low to create"})
 		return
 	}
-	if err := data.CreateUnit(&unit, db); err != nil {
+	if err := data.UpdateUnit(id, &unit, db); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		// 错误信息500,把error发送
 		return
 	}
-	// 发送状态码200
-	c.JSON(http.StatusOK, gin.H{"msg": "Unit created successfully"})
+
+	c.JSON(http.StatusOK, gin.H{"message": "Unit updated successfully"})
 }
 
-func UserCreateGroup(c *gin.Context) {
+func UserUpdateGroup(c *gin.Context) {
 	db := c.MustGet("db").(*gorm.DB)
-	var user data.AvtUser
-	// 请求响应绑定File结构
+	id := c.Param("id")
+
+	var user model.SysBackendUser
 	if err := c.ShouldBind(&user); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		// 错误信息400,把error发送
 		return
 	}
-	if err := data.CreateUser(&user, db); err != nil {
+	if err := data.UpdateUser(id, &user, db); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		// 错误信息500,把error发送
 		return
 	}
-	// 发送状态码200
-	c.JSON(http.StatusOK, "User created successfully")
+
+	c.JSON(http.StatusOK, gin.H{"message": "User updated successfully"})
 }

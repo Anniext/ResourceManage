@@ -2,5 +2,5 @@
   "app_port": ":5500",
   "upload_port": ":5501",
   "download_port": ":5502",
-  "dsn": "root:123456@tcp(8.142.129.250:33060)/rema?charset=utf8"
+  "dsn": "root:123456@tcp(8.142.129.250:33060)/rema?charset=utf8&parseTime=true"
 }
