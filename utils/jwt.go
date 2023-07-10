@@ -3,6 +3,7 @@ package utils
 import (
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/gin-gonic/gin"
 	"time"
 )
 
@@ -13,7 +14,7 @@ var VerifyKey = []byte("Avtronsys")
 type UserInfo struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
-	Prmisss  Permissions
+	Prmiss   Permissions
 }
 
 type Permissions struct {
@@ -27,7 +28,7 @@ type CustomClaims struct {
 }
 
 func GeneratorJwt(userInfo *UserInfo) (string, error) {
-	expire := userInfo.Prmisss.Expires
+	expire := userInfo.Prmiss.Expires
 	claims := &CustomClaims{
 		&jwt.StandardClaims{
 			ExpiresAt: time.Now().Add((time.Hour * 24) * time.Duration(expire)).Unix(),
@@ -63,4 +64,10 @@ func ParseJwt(tokenStr string) interface{} {
 		}
 	}
 	return nil
+}
+
+func GetJwtClaims(c *gin.Context) interface{} {
+	tk := GetAuthorization(c)
+	mapclaims := ParseJwt(tk)
+	return mapclaims
 }

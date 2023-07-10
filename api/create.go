@@ -2,6 +2,7 @@ package services
 
 import (
 	"ResourceManage/data"
+	"ResourceManage/utils"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"log"
@@ -43,11 +44,20 @@ func FileCreateGroup(c *gin.Context) {
 
 func UnitCreateGroup(c *gin.Context) {
 	db := c.MustGet("db").(*gorm.DB)
+	level, errStr := utils.GetLevel(utils.GetJwtClaims(c)) //通过token获取level
+	if errStr != "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": errStr})
+		return
+	}
 	var unit data.AvtUnit
 	// 请求响应绑定File结构
 	if err := c.ShouldBind(&unit); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		// 错误信息400,把error发送
+		return
+	}
+	if unit.Level <= level {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Permission too low to create"})
 		return
 	}
 	if err := data.CreateUnit(&unit, db); err != nil {
@@ -56,7 +66,7 @@ func UnitCreateGroup(c *gin.Context) {
 		return
 	}
 	// 发送状态码200
-	c.JSON(http.StatusOK, "Unit created successfully")
+	c.JSON(http.StatusOK, gin.H{"msg": "Unit created successfully"})
 }
 
 func UserCreateGroup(c *gin.Context) {

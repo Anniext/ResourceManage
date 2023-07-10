@@ -58,18 +58,18 @@ func GetUnit(id string, db *gorm.DB) (*AvtUnit, error) {
 	return &unit, nil
 }
 
-func GetUnitList(db *gorm.DB, delete_id string) ([]AvtUnit, error) {
+func GetUnitList(db *gorm.DB, delete_id string, l int) ([]AvtUnit, error) {
 	var units []AvtUnit
 	if delete_id == "0" {
-		if err := db.Table("avt_unit").Find(&units).Error; err != nil {
+		if err := db.Table("avt_unit").Where("level >= ?", l).Find(&units).Error; err != nil {
 			return nil, err
 		}
 	} else if delete_id == "1" {
-		if err := db.Table("avt_unit").Where("is_delete = ?", 1).Find(&units).Error; err != nil {
+		if err := db.Table("avt_unit").Where("is_delete = ? and level >= ?", 1, l).Find(&units).Error; err != nil {
 			return nil, err
 		}
 	} else if delete_id == "2" {
-		if err := db.Table("avt_unit").Where("is_delete = ?", 0).Find(&units).Error; err != nil {
+		if err := db.Table("avt_unit").Where("is_delete = ? and level >= ?", 0, l).Find(&units).Error; err != nil {
 			return nil, err
 		}
 	}

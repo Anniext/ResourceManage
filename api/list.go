@@ -2,6 +2,7 @@ package services
 
 import (
 	"ResourceManage/data"
+	"ResourceManage/utils"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"log"
@@ -48,7 +49,12 @@ func FileListGroup(c *gin.Context) {
 func UnitListGroup(c *gin.Context) {
 	db := c.MustGet("db").(*gorm.DB)
 	delete_id := c.Param("delete_id")
-	units, err := data.GetUnitList(db, delete_id)
+	level, errStr := utils.GetLevel(utils.GetJwtClaims(c)) //通过token获取level
+	if errStr != "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": errStr})
+		return
+	}
+	units, err := data.GetUnitList(db, delete_id, level)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		// 错误信息500,把error发送

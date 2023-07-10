@@ -32,17 +32,22 @@ func (r *RouterGroup) Login(c *gin.Context) {
 }
 
 func (r *RouterGroup) Authentication(c *gin.Context) {
-	tk := c.Request.Header.Get("Authorization")
+	tk := utils.GetAuthorization(c)
 	if tk == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "token为空"})
 		return
 	}
-	result := utils.ParseJwt(tk)
+	result := utils.GetJwtClaims(c)
 	if result == nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "token无效"})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"msg": result})
+	level, errStr := utils.GetLevel(result)
+	if errStr != "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": errStr})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"msg": level})
 }
 
 // CheckUser 密码鉴权
@@ -52,8 +57,8 @@ func CheckUser(user *utils.UserInfo) bool {
 	sysUser := data.CacheBackendUser.Get(user.Username)
 	userPwd := sysUser.UserPwd
 	if logUserPwdMd5 == userPwd {
-		user.Prmisss.Expires = sysUser.Expires
-		user.Prmisss.Level = sysUser.Level
+		user.Prmiss.Expires = sysUser.Expires
+		user.Prmiss.Level = sysUser.Level
 		return true
 	} else {
 		return false

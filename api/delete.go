@@ -2,6 +2,7 @@ package services
 
 import (
 	"ResourceManage/data"
+	"ResourceManage/utils"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"log"
@@ -37,7 +38,16 @@ func FileDeleteGroup(c *gin.Context) {
 func UnitDeleteGroup(c *gin.Context) {
 	db := c.MustGet("db").(*gorm.DB)
 	id := c.Param("id")
-
+	level, errStr := utils.GetLevel(utils.GetJwtClaims(c)) //通过token获取level
+	if errStr != "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": errStr})
+		return
+	}
+	unit, _ := data.GetUnit(id, db)
+	if unit.Level <= level {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Permission too low to delete"})
+		return
+	}
 	if err := data.DeleteUnit(id, db); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
