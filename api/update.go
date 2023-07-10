@@ -2,6 +2,7 @@ package services
 
 import (
 	"ResourceManage/data"
+	"ResourceManage/utils"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"log"
@@ -48,6 +49,15 @@ func UnitUpdateGroup(c *gin.Context) {
 	if err := c.ShouldBind(&unit); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		// 错误信息400,把error发送
+		return
+	}
+	level, errStr := utils.GetLevel(utils.GetJwtClaims(c)) //通过token获取level
+	if errStr != "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": errStr})
+		return
+	}
+	if unit.Level <= level {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Permission too low to create"})
 		return
 	}
 	if err := data.UpdateUnit(id, &unit, db); err != nil {
