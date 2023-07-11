@@ -29,3 +29,11 @@ func (r *RouterGroup) LoadBackendUserData(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, err)
 }
+
+func (r *RouterGroup) LoadRelaUnitFileData(c *gin.Context) {
+	err := data.LoadRelaUnitFileData()
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	}
+	c.JSON(http.StatusOK, err)
+}

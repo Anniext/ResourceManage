@@ -24,11 +24,12 @@ func (r *RouterGroup) SetRouter() {
 }
 
 func SetResource(r *RouterGroup) {
+	//r.Use(DevSqlDate())
 	r.POST("/create", FileManager.Create)
-	r.GET("/get/:id", FileManager.Get)
-	r.GET("/list/:delete_id", FileManager.List)
-	r.PUT("/update/:id", FileManager.Update)
-	r.DELETE("/delete/:id", FileManager.Delete)
+	r.GET("/get", FileManager.Get)
+	r.GET("/list/:page", FileManager.List)
+	r.PUT("/update/", FileManager.Update)
+	r.DELETE("/delete/", FileManager.Delete)
 
 }
 
@@ -49,11 +50,10 @@ func SetUser(r *RouterGroup) {
 }
 
 func (r *RouterGroup) SetCache() {
-	r.Use(DevSqlDate())
 	r.GET("/LoadFileData", CacheManager.LoadFileData)
 	r.GET("/LoadUnitData", CacheManager.LoadUnitData)
-	//r.GET("/LoadUserData", CacheManager.LoadUnitData)
 	r.GET("/LoadBackendUserData", CacheManager.LoadBackendUserData)
+	r.GET("/LoadRelaUnitFileData", CacheManager.LoadRelaUnitFileData)
 }
 
 func (r *RouterGroup) SetHttp() {

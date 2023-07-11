@@ -24,8 +24,8 @@ func (r *RouterGroup) Create(c *gin.Context) {
 	}
 }
 
+// FileCreateGroup 创建资源
 func FileCreateGroup(c *gin.Context) {
-	db := c.MustGet("db").(*gorm.DB)
 	var file model.AvtFile
 	// 请求响应绑定File结构
 	if err := c.ShouldBind(&file); err != nil {
@@ -33,18 +33,17 @@ func FileCreateGroup(c *gin.Context) {
 		// 错误信息400,把error发送
 		return
 	}
-	//log.Println(r)
-	if err := data.CreateFile(&file, db); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		// 错误信息500,把error发送
+
+	if err := data.CreateFile(&file); err != "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
 	// 发送状态码200
-	c.JSON(http.StatusOK, "File created successfully")
+	c.JSON(http.StatusOK, gin.H{"msg": "File created successfully"})
+
 }
 
 func UnitCreateGroup(c *gin.Context) {
-	db := c.MustGet("db").(*gorm.DB)
 	level, errStr := utils.GetLevel(utils.GetJwtClaims(c)) //通过token获取level
 	if errStr != "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": errStr})
@@ -61,8 +60,8 @@ func UnitCreateGroup(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Permission too low to create"})
 		return
 	}
-	if err := data.CreateUnit(&unit, db); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	if err := data.CreateUnit(&unit); err != "" {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 		// 错误信息500,把error发送
 		return
 	}

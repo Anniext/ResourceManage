@@ -25,21 +25,20 @@ func (r *RouterGroup) Update(c *gin.Context) {
 }
 
 func FileUpdateGroup(c *gin.Context) {
-	db := c.MustGet("db").(*gorm.DB)
-	id := c.Param("id")
+	name := c.Query("name")
 	var file model.AvtFile
 	if err := c.ShouldBind(&file); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		// 错误信息400,把error发送
 		return
 	}
-	if err := data.UpdateFile(id, &file, db); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	if err := data.UpdateFile(name, &file); err != "" {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 		// 错误信息500,把error发送
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "File updated successfully"})
+	c.JSON(http.StatusOK, gin.H{"msg": "File updated successfully"})
 }
 
 func UnitUpdateGroup(c *gin.Context) {

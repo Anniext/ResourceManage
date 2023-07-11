@@ -57,7 +57,7 @@ func CheckUser(user *utils.UserInfo) bool {
 	sysUser := data.CacheBackendUser.Get(user.Username)
 	userPwd := sysUser.UserPwd
 	if logUserPwdMd5 == userPwd {
-		user.Prmiss.Expires = sysUser.Expires
+		user.Prmiss.Expires = *sysUser.Expires
 		user.Prmiss.Level = sysUser.Level
 		return true
 	} else {

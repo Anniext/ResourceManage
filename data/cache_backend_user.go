@@ -1,8 +1,8 @@
 package data
 
 import (
-	"ResourceManage/dao"
 	"ResourceManage/model"
+	"ResourceManage/query"
 	"log"
 	"sync"
 )
@@ -20,12 +20,12 @@ func NewBackendUserMap() *BackendUserMap {
 
 func LoadBackendUserData() (err error) {
 	var userDataList []*model.SysBackendUser
-	err = dao.AvtFile.Scan(&userDataList)
+	err = query.AvtFile.Scan(&userDataList)
 	if err != nil {
 		log.Println("sys_backend_user表数据加载错误：", err)
 		return err
 	}
-	count, _ := dao.AvtFile.Count()
+	count, _ := query.AvtFile.Count()
 	if count > 0 {
 		log.Println("sys_backend_user表缓存数据加载成功!")
 		for _, user := range userDataList {

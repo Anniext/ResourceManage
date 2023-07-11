@@ -2,7 +2,7 @@ package services
 
 import (
 	"ResourceManage/config"
-	"ResourceManage/dao"
+	"ResourceManage/query"
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -29,8 +29,8 @@ type CacheInterface interface {
 	SetCache()
 	LoadFileData(c *gin.Context)
 	LoadUnitData(c *gin.Context)
-	//LoadUserData(c *gin.Context)
 	LoadBackendUserData(c *gin.Context)
+	LoadRelaUnitFileData(c *gin.Context)
 }
 
 type TokenInterface interface {
@@ -58,9 +58,7 @@ func RouterGroupInit() {
 	router = gin.Default()
 	router.Use(DevCors()) //使用自定义的跨域中间件
 	api = &RouterGroup{router.Group("/api")}
-	api.Use(func(c *gin.Context) {
 
-	})
 	FileManager = &RouterGroup{api.Group("/resource")}
 	HttpManager = &RouterGroup{api.Group("/resource")}
 	CacheManager = &RouterGroup{api.Group("/cache")}
@@ -70,11 +68,11 @@ func RouterGroupInit() {
 }
 
 func Serviceinit() {
-	dao.SetDefault(DevReturnDB()) //初始化数据服务
-	GroupInit()                   // 初始化路由
-	go StartMainServer()          // 启动主服务
-	go StartUploadServer()        // 启动上传服务
-	go StartDownloadServer()      // 启动下载服务
+	query.SetDefault(DevReturnDB()) //初始化数据服务
+	GroupInit()                     // 初始化路由
+	go StartMainServer()            // 启动主服务
+	go StartUploadServer()          // 启动上传服务
+	go StartDownloadServer()        // 启动下载服务
 }
 
 func StartMainServer() {

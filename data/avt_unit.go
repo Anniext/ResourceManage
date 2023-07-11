@@ -7,13 +7,21 @@ import (
 	"time"
 )
 
-func CreateUnit(unit *model.AvtUnit, db *gorm.DB) error {
+func CreateUnit(unit *model.AvtUnit) string {
 	unit.CreateTime = time.Now()
 	unit.UpdateTime = time.Now()
-	if err := db.Table("avt_unit").Create(unit).Error; err != nil {
-		return err
+	//if err := db.Table("avt_unit").Create(unit).Error; err != nil {
+	//	return err
+	//}
+	if CacheUnit.Get(unit.Name) != nil {
+		return "Unit name already exists"
 	}
-	return nil
+	CacheUnit.Set(unit)
+	if err := CacheUnit.Sync(unit); err != nil {
+		log.Println("CacheFile Sync err:", err)
+		return err.Error()
+	}
+	return ""
 }
 
 func GetUnit(id string, db *gorm.DB) (*model.AvtUnit, error) {

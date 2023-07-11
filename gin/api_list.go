@@ -35,9 +35,13 @@ func GetGroupName(r *RouterGroup) string {
 }
 
 func FileListGroup(c *gin.Context) {
-	db := c.MustGet("db").(*gorm.DB)
-	delete_id := c.Param("delete_id")
-	list, err := data.GetFileList(db, delete_id)
+	arg := data.GetHeadBody{
+		Page:   c.Param("page"),
+		Limit:  c.Query("limit"),
+		Offset: c.Query("offset"),
+		Delete: c.Query("delete"),
+	}
+	list, err := data.GetFileList(&arg)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		// 错误信息500,把error发送

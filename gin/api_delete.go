@@ -24,15 +24,12 @@ func (r *RouterGroup) Delete(c *gin.Context) {
 }
 
 func FileDeleteGroup(c *gin.Context) {
-	db := c.MustGet("db").(*gorm.DB)
-	id := c.Param("id")
-
-	if err := data.DeleteFile(id, db); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	name := c.Query("name")
+	if err := data.DeleteFile(name); err != "" {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 		return
 	}
-
-	c.JSON(http.StatusOK, gin.H{"message": "File deleted"})
+	c.JSON(http.StatusOK, gin.H{"mes": "File deleted successfully"})
 }
 
 func UnitDeleteGroup(c *gin.Context) {

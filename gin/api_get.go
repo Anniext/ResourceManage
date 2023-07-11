@@ -23,12 +23,10 @@ func (r *RouterGroup) Get(c *gin.Context) {
 }
 
 func FileGetGroup(c *gin.Context) {
-	db := c.MustGet("db").(*gorm.DB)
-	//获取路由参数
-	id := c.Param("id")
-	file, err := data.GetFile(id, db)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	name := c.Query("name")
+	file, err := data.GetFile(name)
+	if err != "" {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 		// 错误信息500,把error发送
 		return
 	}
