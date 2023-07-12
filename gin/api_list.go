@@ -2,7 +2,6 @@ package services
 
 import (
 	"ResourceManage/data"
-	"ResourceManage/utils"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"log"
@@ -41,30 +40,34 @@ func FileListGroup(c *gin.Context) {
 		Offset: c.Query("offset"),
 		Delete: c.Query("delete"),
 	}
-	list, err := data.GetFileList(&arg)
+	list, count, err := data.GetFileList(&arg)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		// 错误信息500,把error发送
 		return
 	}
-	c.JSON(http.StatusOK, list)
+	c.JSON(http.StatusOK, gin.H{"filelist": list, "count": count})
 }
 
 func UnitListGroup(c *gin.Context) {
-	db := c.MustGet("db").(*gorm.DB)
-	delete_id := c.Param("delete_id")
-	level, errStr := utils.GetLevel(utils.GetJwtClaims(c)) //通过token获取level
-	if errStr != "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": errStr})
-		return
+
+	//level, errStr := utils.GetLevel(utils.GetJwtClaims(c)) //通过token获取level
+	//if errStr != "" {
+	//	c.JSON(http.StatusBadRequest, gin.H{"error": errStr})
+	//	return
+	//}
+	arg := data.GetHeadBody{
+		Page:   c.Param("page"),
+		Limit:  c.Query("limit"),
+		Offset: c.Query("offset"),
 	}
-	units, err := data.GetUnitList(db, delete_id, level)
+	units, count, err := data.GetUnitList(&arg, 1)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		// 错误信息500,把error发送
 		return
 	}
-	c.JSON(http.StatusOK, units)
+	c.JSON(http.StatusOK, gin.H{"unitlist": units, "count": count})
 }
 
 func UserListGroup(c *gin.Context) {

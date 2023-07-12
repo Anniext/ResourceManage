@@ -50,7 +50,7 @@ func GetFileData() (err error) {
 func GetUnitData() (err error) {
 	_, err = http.Get("http://127.0.0.1" + config.Configs.AppPort + "/api/cache/LoadUnitData")
 	if err != nil {
-		log.Println("file_data请求失败:", err)
+		log.Println("unit_data请求失败:", err)
 	}
 	return
 }

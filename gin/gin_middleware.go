@@ -54,3 +54,17 @@ func DevSqlDate() gin.HandlerFunc {
 		c.Next()
 	}
 }
+
+//func Authention() gin.HandlerFunc {
+//	return func(c *gin.Context) {
+//		level, errStr := utils.GetLevel(utils.GetJwtClaims(c)) //通过token获取level
+//		if errStr != "" {
+//			c.JSON(http.StatusBadRequest, gin.H{"error": errStr})
+//			return
+//		}
+//		//if unit.Level <= level {
+//		//	c.JSON(http.StatusBadRequest, gin.H{"error": "Permission too low to create"})
+//		//	return
+//		//}
+//	}
+//}

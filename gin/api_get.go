@@ -34,13 +34,10 @@ func FileGetGroup(c *gin.Context) {
 }
 
 func UnitGetGroup(c *gin.Context) {
-	db := c.MustGet("db").(*gorm.DB)
-	//获取路由参数
-	id := c.Param("id")
-
-	unit, err := data.GetUnit(id, db)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	name := c.Query("name")
+	unit, err := data.GetUnit(name)
+	if err != "" {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 		// 错误信息500,把error发送
 		return
 	}

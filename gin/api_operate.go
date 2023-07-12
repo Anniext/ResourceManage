@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 	"io"
 	"log"
 	"mime/multipart"
@@ -24,21 +23,19 @@ type rangeBytes struct {
 }
 
 func (r *RouterGroup) Upload(c *gin.Context) {
-	db := c.MustGet("db").(*gorm.DB)
 	var file model.AvtFile
-	//w := c.Writer
 	read := c.Request
 	f, handler, err := read.FormFile("file")
 	if err != nil {
-		log.Println("Error Retrieving the File", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	}
 	defer func(file multipart.File) {
 		err := file.Close()
 		if err != nil {
-			log.Println("Error close file", err)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		}
 	}(f)
-	if err := data.UploadFile(handler, f, &file, db); err != nil {
+	if err := data.UploadFile(handler, f, &file); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -125,7 +122,7 @@ func (r *RouterGroup) Download(c *gin.Context) {
 		}
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "file download successfully"})
+	c.JSON(http.StatusOK, gin.H{"msg": "file download successfully"})
 }
 
 func parseRangeHeader(rangeHeader string, fileSize int64) (rangeBytes, error) {

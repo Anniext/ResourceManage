@@ -3,7 +3,6 @@ package data
 import (
 	"ResourceManage/model"
 	"ResourceManage/query"
-	"gorm.io/gorm"
 	"io"
 	"log"
 	"mime/multipart"
@@ -44,24 +43,26 @@ func GetFile(name string) (*model.AvtFile, string) {
 	return nil, "File does not exist"
 }
 
-func GetFileList(arg *GetHeadBody) ([]model.AvtFile, error) {
+func GetFileList(arg *GetHeadBody) ([]model.AvtFile, int64, error) {
 	var files []model.AvtFile
 	//offset, _ := strconv.Atoi(arg.Offset)
 	limit, _ := strconv.Atoi(arg.Limit)
 	page, _ := strconv.Atoi(arg.Page)
 	v_delete, _ := strconv.ParseInt(arg.Delete, 10, 64)
-	err := query.AvtFile.Offset((page * limit) - limit).Limit(limit).Where(query.AvtFile.IsDelete.Eq(v_delete)).Scan(&files)
-	if err != nil {
-		return nil, err
+	if err := query.AvtFile.Offset((page * limit) - limit).Limit(limit).Where(query.AvtFile.IsDelete.Eq(v_delete)).Scan(&files); err != nil {
+		return nil, 0, err
 	}
-
-	return files, nil
+	count, err := query.AvtFile.Where(query.AvtFile.IsDelete.Eq(v_delete)).Count()
+	if err != nil {
+		return nil, 0, err
+	}
+	return files, count, nil
 }
 
 func UpdateFile(name string, file *model.AvtFile) string {
 	existingFile, err := GetFile(name)
 	if err != "" {
-		return "File does not exist"
+		return err
 	}
 	existingFile.Name = file.Name
 	existingFile.FilePath = file.FilePath
@@ -74,11 +75,11 @@ func UpdateFile(name string, file *model.AvtFile) string {
 }
 
 func DeleteFile(name string) string {
-	if cache := CacheFile.Get(name); cache == nil {
+	cache := CacheFile.Get(name)
+	if cache == nil {
 		return "File does not exist"
 	}
-	file := CacheFile.Get(name)
-	if _, err := query.AvtFile.Delete(file); err != nil {
+	if _, err := query.AvtFile.Delete(cache); err != nil {
 		log.Println("avt_file表数据同步错误：", err)
 		return err.Error()
 	}
@@ -89,17 +90,11 @@ func DeleteFile(name string) string {
 	return ""
 }
 
-func UploadFile(handler *multipart.FileHeader, f multipart.File, fileData *model.AvtFile, db *gorm.DB) error {
-	//path, _ := os.Getwd()
-
+func UploadFile(handler *multipart.FileHeader, f multipart.File, fileData *model.AvtFile) error {
 	fstr := strings.Split(handler.Filename, ".")
-	var ftype string
-	var fname string
-	fname = fstr[0]
-	ftype = handler.Header.Get("Content-Type")
-	log.Printf("MIME Header: %+v\n", handler.Header)
-	// 创建一个新文件，将上传的文件数据写入其中
-
+	fname := fstr[0]
+	ftypelist := strings.Split(handler.Header.Get("Content-Type"), "/")
+	ftype := ftypelist[len(ftypelist)-1]
 	tf, err := os.OpenFile("uploads/"+handler.Filename, os.O_WRONLY|os.O_CREATE, 0666)
 	if err != nil {
 		log.Println(err)
@@ -124,53 +119,11 @@ func UploadFile(handler *multipart.FileHeader, f multipart.File, fileData *model
 	fileData.CreateTime = time.Now()
 	fileData.UpdateTime = time.Now()
 	fileData.IsDelete = 0
-	fileData.Status = 1
+	fileData.Status = 0
 	fileData.File = handler.Filename
-	if err := db.Table("avt_file").Create(fileData).Error; err != nil {
-		log.Println(err)
-		return err
-	}
-	return nil
-}
-
-func DowloadFile(handler *multipart.FileHeader, f multipart.File, fileData *model.AvtFile, db *gorm.DB) error {
-	//path, _ := os.Getwd()
-
-	fstr := strings.Split(handler.Filename, ".")
-	var ftype string
-	var fname string
-	fname = fstr[0]
-	ftype = handler.Header.Get("Content-Type")
-	log.Printf("MIME Header: %+v\n", handler.Header)
-	// 创建一个新文件，将上传的文件数据写入其中
-
-	tf, err := os.OpenFile("uploads/"+handler.Filename, os.O_WRONLY|os.O_CREATE, 0666)
+	CacheFile.Set(fileData)
+	err = CacheFile.Sync(fileData)
 	if err != nil {
-		log.Println(err)
-		return err
-	}
-	defer func(f *os.File) {
-		err := f.Close()
-		if err != nil {
-			log.Println(err)
-		}
-	}(tf)
-	_, _ = io.Copy(tf, f)
-
-	if err != nil {
-		log.Println(err)
-		return err
-	}
-	fileData.Name = fname
-	fileData.Size = int64(int(handler.Size))
-	fileData.FilePath = "uploads/"
-	fileData.Type = ftype
-	fileData.CreateTime = time.Now()
-	fileData.UpdateTime = time.Now()
-	fileData.IsDelete = 0
-	fileData.Status = 1
-	if err := db.Table("avt_file").Create(fileData).Error; err != nil {
-		log.Println(err)
 		return err
 	}
 	return nil

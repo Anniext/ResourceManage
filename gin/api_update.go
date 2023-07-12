@@ -3,7 +3,6 @@ package services
 import (
 	"ResourceManage/data"
 	"ResourceManage/model"
-	"ResourceManage/utils"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"log"
@@ -42,31 +41,21 @@ func FileUpdateGroup(c *gin.Context) {
 }
 
 func UnitUpdateGroup(c *gin.Context) {
-	db := c.MustGet("db").(*gorm.DB)
-	id := c.Param("id")
-
+	name := c.Query("name")
 	var unit model.AvtUnit
 	if err := c.ShouldBind(&unit); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		// 错误信息400,把error发送
 		return
 	}
-	level, errStr := utils.GetLevel(utils.GetJwtClaims(c)) //通过token获取level
-	if errStr != "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": errStr})
-		return
-	}
-	if unit.Level <= level {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Permission too low to create"})
-		return
-	}
-	if err := data.UpdateUnit(id, &unit, db); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+
+	if err := data.UpdateUnit(name, &unit); err != "" {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 		// 错误信息500,把error发送
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Unit updated successfully"})
+	c.JSON(http.StatusOK, gin.H{"msg": "Unit updated successfully"})
 }
 
 func UserUpdateGroup(c *gin.Context) {
@@ -85,5 +74,5 @@ func UserUpdateGroup(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "User updated successfully"})
+	c.JSON(http.StatusOK, gin.H{"msg": "User updated successfully"})
 }

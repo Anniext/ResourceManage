@@ -35,10 +35,10 @@ func SetResource(r *RouterGroup) {
 
 func SetUnit(r *RouterGroup) {
 	r.POST("/create", UnitManager.Create)
-	r.GET("/get/:id", UnitManager.Get)
-	r.GET("/list/:delete_id", UnitManager.List)
-	r.PUT("/update/:id", UnitManager.Update)
-	r.DELETE("/delete/:id", UnitManager.Delete)
+	r.GET("/get", UnitManager.Get)
+	r.GET("/list/:page", UnitManager.List)
+	r.PUT("/update", UnitManager.Update)
+	r.DELETE("/delete", UnitManager.Delete)
 }
 
 func SetUser(r *RouterGroup) {

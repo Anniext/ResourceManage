@@ -2,17 +2,15 @@ package data
 
 import (
 	"ResourceManage/model"
-	"gorm.io/gorm"
+	"ResourceManage/query"
 	"log"
+	"strconv"
 	"time"
 )
 
 func CreateUnit(unit *model.AvtUnit) string {
 	unit.CreateTime = time.Now()
 	unit.UpdateTime = time.Now()
-	//if err := db.Table("avt_unit").Create(unit).Error; err != nil {
-	//	return err
-	//}
 	if CacheUnit.Get(unit.Name) != nil {
 		return "Unit name already exists"
 	}
@@ -24,54 +22,54 @@ func CreateUnit(unit *model.AvtUnit) string {
 	return ""
 }
 
-func GetUnit(id string, db *gorm.DB) (*model.AvtUnit, error) {
-	var unit model.AvtUnit
-	if err := db.Table("avt_unit").Where("id = ?", id).First(&unit).Error; err != nil {
-		return nil, err
+func GetUnit(name string) (*model.AvtUnit, string) {
+	if unit := CacheUnit.Get(name); unit != nil {
+		return unit, ""
 	}
-	return &unit, nil
+	return nil, "Unit does not exist"
 }
 
-func GetUnitList(db *gorm.DB, delete_id string, l int64) ([]model.AvtUnit, error) {
+func GetUnitList(arg *GetHeadBody, userid int64) ([]model.AvtUnit, int64, error) {
 	var units []model.AvtUnit
-	if delete_id == "0" {
-		if err := db.Table("avt_unit").Where("level >= ?", l).Find(&units).Error; err != nil {
-			return nil, err
-		}
-	} else if delete_id == "1" {
-		if err := db.Table("avt_unit").Where("is_delete = ? and level >= ?", 1, l).Find(&units).Error; err != nil {
-			return nil, err
-		}
-	} else if delete_id == "2" {
-		if err := db.Table("avt_unit").Where("is_delete = ? and level >= ?", 0, l).Find(&units).Error; err != nil {
-			return nil, err
-		}
+	//offset, _ := strconv.Atoi(arg.Offset)
+	limit, _ := strconv.Atoi(arg.Limit)
+	page, _ := strconv.Atoi(arg.Page)
+	//v_delete, _ := strconv.ParseInt(arg.Delete, 10, 64)
+	if err := query.AvtUnit.Offset((page * limit) - limit).Limit(limit).Where(query.AvtUnit.UserID.Eq(userid)).Scan(&units); err != nil {
+		return nil, 0, err
 	}
-	return units, nil
+	count, err := query.AvtUnit.Where(query.AvtUnit.UserID.Eq(userid)).Count()
+	if err != nil {
+		return nil, 0, err
+	}
+	return units, count, nil
 }
 
-func UpdateUnit(id string, unit *model.AvtUnit, db *gorm.DB) error {
-	existingUnit, err := GetUnit(id, db)
-	if err != nil {
-		log.Println("GetUnit err:", err)
+func UpdateUnit(name string, unit *model.AvtUnit) string {
+	existingUnit, err := GetUnit(name)
+	if err != "" {
 		return err
 	}
 	existingUnit.Name = unit.Name
-	existingUnit.Level = unit.Level
-	existingUnit.UserID = unit.UserID
-	existingUnit.ParentID = unit.ParentID
 	existingUnit.UpdateTime = time.Now()
 	existingUnit.Address = unit.Address
-	if err := db.Table("avt_unit").Save(existingUnit).Error; err != nil {
-		return err
-	}
+	CacheUnit.Update(existingUnit)
 
-	return nil
+	return ""
 }
 
-func DeleteUnit(id string, db *gorm.DB) error {
-	if err := db.Table("avt_unit").Where("id = ?", id).Delete(&model.AvtUnit{}).Error; err != nil {
-		return err
+func DeleteUnit(name string) string {
+	cache := CacheUnit.Get(name)
+	if cache == nil {
+		return "Unit does not exist"
 	}
-	return nil
+	if _, err := query.AvtUnit.Delete(cache); err != nil {
+		log.Println("avt_unit表数据同步错误：", err)
+		return err.Error()
+	}
+	CacheUnit.Clear()
+	if err := GetUnitData(); err != nil {
+		return "GetUnitData err:" + err.Error()
+	}
+	return ""
 }

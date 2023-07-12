@@ -2,7 +2,6 @@ package services
 
 import (
 	"ResourceManage/data"
-	"ResourceManage/utils"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"log"
@@ -29,28 +28,28 @@ func FileDeleteGroup(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"mes": "File deleted successfully"})
+	c.JSON(http.StatusOK, gin.H{"msg": "File deleted successfully"})
 }
 
 func UnitDeleteGroup(c *gin.Context) {
-	db := c.MustGet("db").(*gorm.DB)
-	id := c.Param("id")
-	level, errStr := utils.GetLevel(utils.GetJwtClaims(c)) //通过token获取level
-	if errStr != "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": errStr})
-		return
-	}
-	unit, _ := data.GetUnit(id, db)
-	if unit.Level <= level {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Permission too low to delete"})
-		return
-	}
-	if err := data.DeleteUnit(id, db); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	name := c.Query("name")
+	//level, errStr := utils.GetLevel(utils.GetJwtClaims(c)) //通过token获取level
+	//if errStr != "" {
+	//	c.JSON(http.StatusBadRequest, gin.H{"error": errStr})
+	//	return
+	//}
+	//unit, _ := data.GetUnit(name)
+	//if unit.Level <= level {
+	//	c.JSON(http.StatusBadRequest, gin.H{"error": "Permission too low to delete"})
+	//	return
+	//}
+
+	if err := data.DeleteUnit(name); err != "" {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Unit deleted"})
+	c.JSON(http.StatusOK, gin.H{"msg": "Unit deleted successfully"})
 }
 
 func UserDeleteGroup(c *gin.Context) {
@@ -62,5 +61,5 @@ func UserDeleteGroup(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "User deleted"})
+	c.JSON(http.StatusOK, gin.H{"msg": "User deleted successfully"})
 }

@@ -20,7 +20,7 @@ func NewUnitMap() *UnitMap {
 
 func LoadUnitData() (err error) {
 	var unitDataList []*model.AvtUnit
-	err = query.AvtFile.Scan(&unitDataList)
+	err = query.AvtUnit.Scan(&unitDataList)
 	if err != nil {
 		log.Println("avt_unit表数据加载错误：", err)
 		return err
@@ -67,29 +67,26 @@ func (m *UnitMap) Sync(unit *model.AvtUnit) error {
 	return nil
 }
 
-//func (m *UnitMap) Clear() {
-//	m.lock.Lock()
-//	defer m.lock.Unlock()
-//	m.data = make(map[string]*model.AvtFile)
-//}
+func (m *UnitMap) Clear() {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+	m.data = make(map[string]*model.AvtUnit)
+}
 
-//func (m *UnitMap) Update(unit *model.AvtUnit) {
-//	m.lock.Lock()
-//	defer m.lock.Unlock()
-//	if _, ok := m.data[unit.Name]; ok {
-//		delete(m.data, unit.Name)
-//	}
-//	m.data[file.Name] = file
-//	_, err := query.AvtFile.Where(query.AvtFile.ID.Eq(file.ID)).Updates(model.AvtFile{
-//		Name:       file.Name,
-//		Type:       file.Type,
-//		File:       file.File,
-//		UpdateTime: file.UpdateTime,
-//		IsDelete:   file.IsDelete,
-//		Status:     file.Status,
-//	})
-//	if err != nil {
-//		log.Println("avt_file表数据更新错误：", err)
-//		return
-//	}
-//}
+func (m *UnitMap) Update(unit *model.AvtUnit) {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+	if _, ok := m.data[unit.Name]; ok {
+		delete(m.data, unit.Name)
+	}
+	m.data[unit.Name] = unit
+	_, err := query.AvtUnit.Where(query.AvtUnit.ID.Eq(unit.ID)).Updates(model.AvtUnit{
+		Name:       unit.Name,
+		Address:    unit.Address,
+		UpdateTime: unit.UpdateTime,
+	})
+	if err != nil {
+		log.Println("avt_unit表数据更新错误：", err)
+		return
+	}
+}
