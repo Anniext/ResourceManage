@@ -1,6 +1,7 @@
 package services
 
 import (
+	"ResourceManage/utils"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
@@ -55,16 +56,14 @@ func DevSqlDate() gin.HandlerFunc {
 	}
 }
 
-//func Authention() gin.HandlerFunc {
-//	return func(c *gin.Context) {
-//		level, errStr := utils.GetLevel(utils.GetJwtClaims(c)) //通过token获取level
-//		if errStr != "" {
-//			c.JSON(http.StatusBadRequest, gin.H{"error": errStr})
-//			return
-//		}
-//		//if unit.Level <= level {
-//		//	c.JSON(http.StatusBadRequest, gin.H{"error": "Permission too low to create"})
-//		//	return
-//		//}
-//	}
-//}
+func Authention() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		prmiss, errStr := utils.GetLevel(utils.GetJwtClaims(c)) //通过token获取level
+		if errStr != "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": errStr})
+			return
+		}
+		c.Set("prmiss", prmiss)
+		c.Next()
+	}
+}

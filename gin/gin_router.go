@@ -28,8 +28,8 @@ func SetResource(r *RouterGroup) {
 	r.POST("/create", FileManager.Create)
 	r.GET("/get", FileManager.Get)
 	r.GET("/list/:page", FileManager.List)
-	r.PUT("/update/", FileManager.Update)
-	r.DELETE("/delete/", FileManager.Delete)
+	r.PUT("/update", FileManager.Update)
+	r.DELETE("/delete", FileManager.Delete)
 
 }
 
@@ -38,7 +38,7 @@ func SetUnit(r *RouterGroup) {
 	r.GET("/get", UnitManager.Get)
 	r.GET("/list/:page", UnitManager.List)
 	r.PUT("/update", UnitManager.Update)
-	r.DELETE("/delete", UnitManager.Delete)
+	r.DELETE("/delete", Authention(), UnitManager.Delete)
 }
 
 func SetUser(r *RouterGroup) {

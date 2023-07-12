@@ -33,6 +33,7 @@ func FileDeleteGroup(c *gin.Context) {
 
 func UnitDeleteGroup(c *gin.Context) {
 	name := c.Query("name")
+	//primss := c.MustGet("primss")
 	//level, errStr := utils.GetLevel(utils.GetJwtClaims(c)) //通过token获取level
 	//if errStr != "" {
 	//	c.JSON(http.StatusBadRequest, gin.H{"error": errStr})

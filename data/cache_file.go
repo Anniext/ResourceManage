@@ -79,15 +79,16 @@ func (m *FileMap) Update(file *model.AvtFile) {
 	defer m.lock.Unlock()
 	if _, ok := m.data[file.Name]; ok {
 		delete(m.data, file.Name)
+		m.data[file.Name] = file
 	}
 	m.data[file.Name] = file
-	_, err := query.AvtFile.Where(query.AvtFile.ID.Eq(file.ID)).Updates(model.AvtFile{
-		Name:       file.Name,
-		Type:       file.Type,
-		File:       file.File,
-		UpdateTime: file.UpdateTime,
-		IsDelete:   file.IsDelete,
-		Status:     file.Status,
+	_, err := query.AvtFile.Where(query.AvtFile.ID.Eq(file.ID)).Updates(map[string]interface{}{
+		"name":        file.Name,
+		"type":        file.Type,
+		"file":        file.File,
+		"update_time": file.UpdateTime,
+		"is_delete":   file.IsDelete,
+		"status":      file.Status,
 	})
 	if err != nil {
 		log.Println("avt_file表数据更新错误：", err)

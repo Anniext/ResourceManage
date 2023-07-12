@@ -80,10 +80,10 @@ func (m *UnitMap) Update(unit *model.AvtUnit) {
 		delete(m.data, unit.Name)
 	}
 	m.data[unit.Name] = unit
-	_, err := query.AvtUnit.Where(query.AvtUnit.ID.Eq(unit.ID)).Updates(model.AvtUnit{
-		Name:       unit.Name,
-		Address:    unit.Address,
-		UpdateTime: unit.UpdateTime,
+	_, err := query.AvtUnit.Where(query.AvtUnit.ID.Eq(unit.ID)).Updates(map[string]interface{}{
+		"name":        unit.Name,
+		"address":     unit.Address,
+		"update_time": unit.UpdateTime,
 	})
 	if err != nil {
 		log.Println("avt_unit表数据更新错误：", err)

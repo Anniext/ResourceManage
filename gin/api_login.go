@@ -20,7 +20,6 @@ func (r *RouterGroup) Login(c *gin.Context) {
 		// 错误信息401,把error发送
 		return
 	}
-
 	Token, err := token.GetToken(user)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -59,6 +58,7 @@ func CheckUser(user *utils.UserInfo) bool {
 	if logUserPwdMd5 == userPwd {
 		user.Prmiss.Expires = *sysUser.Expires
 		user.Prmiss.Level = sysUser.Level
+		user.Prmiss.UserID = sysUser.ID
 		return true
 	} else {
 		return false

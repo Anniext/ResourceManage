@@ -64,12 +64,12 @@ func UpdateFile(name string, file *model.AvtFile) string {
 	if err != "" {
 		return err
 	}
-	existingFile.Name = file.Name
+	existingFile.Name = name
 	existingFile.FilePath = file.FilePath
 	existingFile.UpdateTime = time.Now()
 	existingFile.IsDelete = file.IsDelete
 	existingFile.Status = file.Status
-	existingFile.File = file.Name + "." + existingFile.Type
+	existingFile.File = name + "." + existingFile.Type
 	CacheFile.Update(existingFile)
 	return ""
 }

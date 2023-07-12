@@ -4,11 +4,11 @@ go 1.20
 
 require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
-	github.com/gin-contrib/cors v1.4.0
 	github.com/gin-gonic/gin v1.9.0
 	gorm.io/driver/mysql v1.5.1
 	gorm.io/gen v0.3.22
 	gorm.io/gorm v1.25.1
+	gorm.io/plugin/dbresolver v1.3.0
 )
 
 require (
@@ -42,5 +42,4 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	gorm.io/datatypes v1.1.1-0.20230130040222-c43177d3cf8c // indirect
 	gorm.io/hints v1.1.0 // indirect
-	gorm.io/plugin/dbresolver v1.3.0 // indirect
 )
