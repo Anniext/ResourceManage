@@ -50,18 +50,13 @@ func FileListGroup(c *gin.Context) {
 }
 
 func UnitListGroup(c *gin.Context) {
-
-	//level, errStr := utils.GetLevel(utils.GetJwtClaims(c)) //通过token获取level
-	//if errStr != "" {
-	//	c.JSON(http.StatusBadRequest, gin.H{"error": errStr})
-	//	return
-	//}
 	arg := data.GetHeadBody{
 		Page:   c.Param("page"),
 		Limit:  c.Query("limit"),
 		Offset: c.Query("offset"),
 	}
-	units, count, err := data.GetUnitList(&arg, 1)
+	prmiss := c.MustGet("prmiss").(map[string]interface{})
+	units, count, err := data.GetUnitList(&arg, prmiss)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		// 错误信息500,把error发送

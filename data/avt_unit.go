@@ -34,16 +34,20 @@ func GetUnit(name string) (*model.AvtUnit, string) {
 	return nil, "Unit does not exist"
 }
 
-func GetUnitList(arg *GetHeadBody, userid int64) ([]model.AvtUnit, int64, error) {
+func GetUnitList(arg *GetHeadBody, prmiss map[string]interface{}) ([]model.AvtUnit, int64, error) {
 	var units []model.AvtUnit
 	//offset, _ := strconv.Atoi(arg.Offset)
 	limit, _ := strconv.Atoi(arg.Limit)
 	page, _ := strconv.Atoi(arg.Page)
+	level := int64(prmiss["level"].(float64))
+	userid := int64(prmiss["user_id"].(float64))
 	//v_delete, _ := strconv.ParseInt(arg.Delete, 10, 64)
-	if err := query.AvtUnit.Offset((page * limit) - limit).Limit(limit).Where(query.AvtUnit.UserID.Eq(userid)).Scan(&units); err != nil {
+	if err := query.AvtUnit.Offset((page * limit) - limit).Limit(limit).Where(query.AvtUnit.UserID.
+		Eq(userid)).Where(query.AvtUnit.Level.Gt(level)).Or(query.AvtUnit.Level.Eq(level)).Scan(&units); err != nil {
 		return nil, 0, err
 	}
-	count, err := query.AvtUnit.Where(query.AvtUnit.UserID.Eq(userid)).Count()
+	count, err := query.AvtUnit.Where(query.AvtUnit.UserID.
+		Eq(userid)).Where(query.AvtUnit.Level.Gt(level)).Or(query.AvtUnit.Level.Eq(level)).Count()
 	if err != nil {
 		return nil, 0, err
 	}
@@ -66,11 +70,11 @@ func UpdateUnit(name string, unit *model.AvtUnit) string {
 func DeleteUnit(i interface{}) string {
 	if p, ok := i.(NamePrmiss); ok {
 		cache := CacheUnit.Get(p.Name)
-		level := p.Primss["level"].(int64)
+		level := p.Primss["level"].(float64)
 		if cache == nil {
 			return "Unit does not exist"
 		}
-		if cache.Level <= level {
+		if cache.Level <= int64(level) {
 			return "Permission too low to delete"
 		}
 		if _, err := query.AvtUnit.Delete(cache); err != nil {
