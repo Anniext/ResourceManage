@@ -20,12 +20,12 @@ func NewBackendUserMap() *BackendUserMap {
 
 func LoadBackendUserData() (err error) {
 	var userDataList []*model.SysBackendUser
-	err = query.AvtFile.Scan(&userDataList)
+	err = query.SysBackendUser.Scan(&userDataList)
 	if err != nil {
 		log.Println("sys_backend_user表数据加载错误：", err)
 		return err
 	}
-	count, _ := query.AvtFile.Count()
+	count, _ := query.SysBackendUser.Count()
 	if count > 0 {
 		log.Println("sys_backend_user表缓存数据加载成功!")
 		for _, user := range userDataList {
@@ -47,4 +47,24 @@ func (m *BackendUserMap) Get(name string) *model.SysBackendUser {
 	m.lock.RLock()
 	defer m.lock.RUnlock()
 	return m.data[name]
+}
+
+func (m *BackendUserMap) Update(user *model.SysBackendUser) {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+	if _, ok := m.data[user.UserName]; ok {
+		delete(m.data, user.UserName)
+		m.data[user.UserName] = user
+	}
+	m.data[user.UserName] = user
+	_, err := query.SysBackendUser.Where(query.SysBackendUser.ID.Eq(user.ID)).Updates(map[string]interface{}{
+		"user_name": user.UserName,
+		"status":    user.Status,
+		"email":     user.Email,
+		"level":     user.Level,
+	})
+	if err != nil {
+		log.Println("avt_file表数据更新错误：", err)
+		return
+	}
 }

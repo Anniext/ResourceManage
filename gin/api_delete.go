@@ -33,19 +33,12 @@ func FileDeleteGroup(c *gin.Context) {
 
 func UnitDeleteGroup(c *gin.Context) {
 	name := c.Query("name")
-	//primss := c.MustGet("primss")
-	//level, errStr := utils.GetLevel(utils.GetJwtClaims(c)) //通过token获取level
-	//if errStr != "" {
-	//	c.JSON(http.StatusBadRequest, gin.H{"error": errStr})
-	//	return
-	//}
-	//unit, _ := data.GetUnit(name)
-	//if unit.Level <= level {
-	//	c.JSON(http.StatusBadRequest, gin.H{"error": "Permission too low to delete"})
-	//	return
-	//}
+	prmiss := c.MustGet("prmiss")
 
-	if err := data.DeleteUnit(name); err != "" {
+	if err := data.DeleteUnit(data.NamePrmiss{
+		Name:   name,
+		Primss: prmiss.(map[string]interface{}),
+	}); err != "" {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 		return
 	}

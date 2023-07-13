@@ -3,7 +3,6 @@ package data
 import (
 	"ResourceManage/model"
 	"gorm.io/gorm"
-	"log"
 )
 
 func CreateUser(user *model.SysBackendUser, db *gorm.DB) error {
@@ -14,12 +13,11 @@ func CreateUser(user *model.SysBackendUser, db *gorm.DB) error {
 	return nil
 }
 
-func GetUser(id string, db *gorm.DB) (*model.SysBackendUser, error) {
-	var user model.SysBackendUser
-	if err := db.Table("sys_user_backend_temp").Where("id = ?", id).First(&user).Error; err != nil {
-		return nil, err
+func GetUser(name string) (*model.SysBackendUser, string) {
+	if user := CacheBackendUser.Get(name); user != nil {
+		return user, ""
 	}
-	return &user, nil
+	return nil, "File does not exist"
 }
 
 func GetUserList(db *gorm.DB) ([]model.SysBackendUser, error) {
@@ -30,23 +28,18 @@ func GetUserList(db *gorm.DB) ([]model.SysBackendUser, error) {
 	return user, nil
 }
 
-func UpdateUser(id string, user *model.SysBackendUser, db *gorm.DB) error {
-	existingUser, err := GetUser(id, db)
-	if err != nil {
-		log.Println("GetUser err:", err)
+func UpdateUser(name string, user *model.SysBackendUser, db *gorm.DB) string {
+	existingUser, err := GetUser(name)
+	if err != "" {
 		return err
 	}
-	existingUser.RealName = user.RealName
-	existingUser.UserPwd = user.UserPwd
-	existingUser.IsSuper = user.IsSuper
+	existingUser.UserName = user.UserName
 	existingUser.Status = user.Status
-	existingUser.Mobile = user.Mobile
 	existingUser.Email = user.Email
-	if err := db.Table("sys_user_backend_temp").Save(existingUser).Error; err != nil {
-		return err
-	}
+	existingUser.Level = user.Level
+	CacheBackendUser.Update(existingUser)
+	return ""
 
-	return nil
 }
 
 func DeleteUser(id string, db *gorm.DB) error {

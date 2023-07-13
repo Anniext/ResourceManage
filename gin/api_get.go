@@ -5,7 +5,6 @@ import (
 	"ResourceManage/model"
 	"ResourceManage/query"
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 	"log"
 	"net/http"
 	"strconv"
@@ -65,12 +64,10 @@ func UnitGetGroup(c *gin.Context) {
 }
 
 func UserGetGroup(c *gin.Context) {
-	db := c.MustGet("db").(*gorm.DB)
-	//获取路由参数
-	id := c.Param("id")
-	unit, err := data.GetUser(id, db)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	name := c.Query("name")
+	unit, err := data.GetUser(name)
+	if err != "" {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 		// 错误信息500,把error发送
 		return
 	}

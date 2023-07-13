@@ -68,8 +68,8 @@ func UserUpdateGroup(c *gin.Context) {
 		// 错误信息400,把error发送
 		return
 	}
-	if err := data.UpdateUser(id, &user, db); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	if err := data.UpdateUser(id, &user, db); err != "" {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 		// 错误信息500,把error发送
 		return
 	}

@@ -28,11 +28,11 @@ func CreateFile(file *model.AvtFile) string {
 	if CacheFile.Get(file.Name) != nil {
 		return "File name already exists"
 	}
-	CacheFile.Set(file)
 	if err := CacheFile.Sync(file); err != nil {
 		log.Println("CacheFile Sync err:", err)
 		return err.Error()
 	}
+	CacheFile.Set(file)
 	return ""
 }
 

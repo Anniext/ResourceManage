@@ -43,7 +43,7 @@ func SetUnit(r *RouterGroup) {
 
 func SetUser(r *RouterGroup) {
 	r.POST("/create", UserManager.Create)
-	r.GET("/get/:id", UserManager.Get)
+	r.GET("/get", UserManager.Get)
 	r.GET("/list/:delete_id", UserManager.List)
 	r.PUT("/update/:id", UserManager.Update)
 	r.DELETE("/delete/:id", UserManager.Delete)

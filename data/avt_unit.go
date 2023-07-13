@@ -8,17 +8,22 @@ import (
 	"time"
 )
 
+type NamePrmiss struct {
+	Name   string
+	Primss map[string]interface{}
+}
+
 func CreateUnit(unit *model.AvtUnit) string {
 	unit.CreateTime = time.Now()
 	unit.UpdateTime = time.Now()
 	if CacheUnit.Get(unit.Name) != nil {
 		return "Unit name already exists"
 	}
-	CacheUnit.Set(unit)
 	if err := CacheUnit.Sync(unit); err != nil {
 		log.Println("CacheFile Sync err:", err)
 		return err.Error()
 	}
+	CacheUnit.Set(unit)
 	return ""
 }
 
@@ -58,18 +63,26 @@ func UpdateUnit(name string, unit *model.AvtUnit) string {
 	return ""
 }
 
-func DeleteUnit(name string) string {
-	cache := CacheUnit.Get(name)
-	if cache == nil {
-		return "Unit does not exist"
-	}
-	if _, err := query.AvtUnit.Delete(cache); err != nil {
-		log.Println("avt_unit表数据同步错误：", err)
-		return err.Error()
-	}
-	CacheUnit.Clear()
-	if err := GetUnitData(); err != nil {
-		return "GetUnitData err:" + err.Error()
+func DeleteUnit(i interface{}) string {
+	if p, ok := i.(NamePrmiss); ok {
+		cache := CacheUnit.Get(p.Name)
+		level := p.Primss["level"].(int64)
+		if cache == nil {
+			return "Unit does not exist"
+		}
+		if cache.Level <= level {
+			return "Permission too low to delete"
+		}
+		if _, err := query.AvtUnit.Delete(cache); err != nil {
+			log.Println("avt_unit表数据同步错误：", err)
+			return err.Error()
+		}
+		CacheUnit.Clear()
+		if err := GetUnitData(); err != nil {
+			return "GetUnitData err:" + err.Error()
+		}
+	} else {
+		return "interface Reflection err"
 	}
 	return ""
 }
