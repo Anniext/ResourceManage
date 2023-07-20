@@ -18,6 +18,8 @@ func (r *RouterGroup) Create(c *gin.Context) {
 		UnitCreateGroup(c)
 	case "user":
 		UserCreateGroup(c)
+    case "rela":
+        RelaCreateGroup(c)
 	default:
 		log.Println("Error group name", groupName)
 	}
@@ -68,6 +70,19 @@ func UnitCreateGroup(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"msg": "Unit created successfully"})
 }
 
+func RelaCreateGroup(c *gin.Context) {
+    var rela model.RelaUnitFile
+    if err := c.ShouldBind(&rela); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
+    if err := data.CreateRela(&rela); err != "" {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+        return
+    }
+    c.JSON(http.StatusOK, gin.H{"msg": "Rela created successfully"})
+}
+
 func UserCreateGroup(c *gin.Context) {
 	db := c.MustGet("db").(*gorm.DB)
 	var user model.SysBackendUser
@@ -85,3 +100,4 @@ func UserCreateGroup(c *gin.Context) {
 	// 发送状态码200
 	c.JSON(http.StatusOK, "User created successfully")
 }
+

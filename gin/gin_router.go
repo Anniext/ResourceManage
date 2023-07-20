@@ -18,6 +18,8 @@ func (r *RouterGroup) SetRouter() {
 		SetUnit(r)
 	case "user":
 		SetUser(r)
+    case "rela":
+        SetRela(r)
 	default:
 		log.Println("Error group name", groupName)
 	}
@@ -30,7 +32,6 @@ func SetResource(r *RouterGroup) {
 	r.GET("/list/:page", FileManager.List)
 	r.PUT("/update", FileManager.Update)
 	r.DELETE("/delete", FileManager.Delete)
-
 }
 
 func SetUnit(r *RouterGroup) {
@@ -49,6 +50,13 @@ func SetUser(r *RouterGroup) {
 	r.DELETE("/delete/:id", UserManager.Delete)
 }
 
+func SetRela(r *RouterGroup) {
+	r.POST("/create", RelaManager.Create)
+	r.GET("/get", RelaManager.Get)
+	r.GET("/list/:page", RelaManager.List)
+	r.PUT("/update", RelaManager.Update)
+	r.DELETE("/delete", RelaManager.Delete)
+}
 func (r *RouterGroup) SetCache() {
 	r.GET("/LoadFileData", CacheManager.LoadFileData)
 	r.GET("/LoadUnitData", CacheManager.LoadUnitData)

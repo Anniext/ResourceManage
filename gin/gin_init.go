@@ -45,6 +45,7 @@ var (
 	FileManager  RouterManager
 	UnitManager  RouterManager
 	UserManager  RouterManager
+    RelaManager  RouterManager
 	CacheManager CacheInterface
 	HttpManager  HttpServerManager
 	TokenManager TokenInterface
@@ -65,6 +66,9 @@ func RouterGroupInit() {
 	UnitManager = &RouterGroup{api.Group("/unit")}
 	UserManager = &RouterGroup{api.Group("/user")}
 	TokenManager = &RouterGroup{api.Group("/token")}
+    RelaManager = &RouterGroup{api.Group("/rela")}
+
+
 }
 
 func Serviceinit() {
@@ -112,6 +116,7 @@ func GroupInit() {
 	CacheManager.SetCache()
 	HttpManager.SetHttp()
 	TokenManager.SetToken()
+    RelaManager.SetRouter()
 }
 
 func DevReturnDB() *gorm.DB {

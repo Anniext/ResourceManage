@@ -48,3 +48,13 @@ func (m *RelaUnitFileMap) Get(unitID int64) *model.RelaUnitFile {
 	defer m.lock.RUnlock()
 	return m.data[unitID]
 }
+
+func (m *RelaUnitFileMap) Sync(rela *model.RelaUnitFile) error {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+	if err := query.RelaUnitFile.Create(rela); err != nil {
+		log.Println("rela_unit_file表数据同步错误：", err)
+		return err
+	}
+	return nil
+}
