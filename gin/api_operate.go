@@ -51,7 +51,7 @@ func (r *RouterGroup) Download(c *gin.Context) {
 		return
 	}
 
-	file, err := os.Open(filePath)
+file, err := os.Open(filePath)
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Failed to open file")
 		return

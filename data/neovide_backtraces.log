@@ -61,3 +61,360 @@
   17: __mh_execute_header
   18: __pthread_joiner_wake
 
+2023-07-20 09:33:20 - Neovide panicked with the message 'Could not parse error code from neovim'. (File: src/bridge/handler.rs; Line: 85, Column: 22)
+   0: __mh_execute_header
+   1: __mh_execute_header
+   2: __mh_execute_header
+   3: __mh_execute_header
+   4: __mh_execute_header
+   5: __mh_execute_header
+   6: __mh_execute_header
+   7: __mh_execute_header
+   8: __mh_execute_header
+   9: __mh_execute_header
+  10: __mh_execute_header
+  11: __mh_execute_header
+  12: __mh_execute_header
+  13: __mh_execute_header
+  14: __mh_execute_header
+  15: __mh_execute_header
+  16: __mh_execute_header
+  17: __mh_execute_header
+  18: __pthread_joiner_wake
+
+2023-07-20 09:41:52 - Neovide panicked with the message 'Could not parse error code from neovim'. (File: src/bridge/handler.rs; Line: 85, Column: 22)
+   0: __mh_execute_header
+   1: __mh_execute_header
+   2: __mh_execute_header
+   3: __mh_execute_header
+   4: __mh_execute_header
+   5: __mh_execute_header
+   6: __mh_execute_header
+   7: __mh_execute_header
+   8: __mh_execute_header
+   9: __mh_execute_header
+  10: __mh_execute_header
+  11: __mh_execute_header
+  12: __mh_execute_header
+  13: __mh_execute_header
+  14: __mh_execute_header
+  15: __mh_execute_header
+  16: __mh_execute_header
+  17: __mh_execute_header
+  18: __pthread_joiner_wake
+
+2023-07-20 09:52:35 - Neovide panicked with the message 'Could not parse error code from neovim'. (File: src/bridge/handler.rs; Line: 85, Column: 22)
+   0: __mh_execute_header
+   1: __mh_execute_header
+   2: __mh_execute_header
+   3: __mh_execute_header
+   4: __mh_execute_header
+   5: __mh_execute_header
+   6: __mh_execute_header
+   7: __mh_execute_header
+   8: __mh_execute_header
+   9: __mh_execute_header
+  10: __mh_execute_header
+  11: __mh_execute_header
+  12: __mh_execute_header
+  13: __mh_execute_header
+  14: __mh_execute_header
+  15: __mh_execute_header
+  16: __mh_execute_header
+  17: __mh_execute_header
+  18: __pthread_joiner_wake
+
+2023-07-20 09:55:12 - Neovide panicked with the message 'Could not parse error code from neovim'. (File: src/bridge/handler.rs; Line: 85, Column: 22)
+   0: __mh_execute_header
+   1: __mh_execute_header
+   2: __mh_execute_header
+   3: __mh_execute_header
+   4: __mh_execute_header
+   5: __mh_execute_header
+   6: __mh_execute_header
+   7: __mh_execute_header
+   8: __mh_execute_header
+   9: __mh_execute_header
+  10: __mh_execute_header
+  11: __mh_execute_header
+  12: __mh_execute_header
+  13: __mh_execute_header
+  14: __mh_execute_header
+  15: __mh_execute_header
+  16: __mh_execute_header
+  17: __mh_execute_header
+  18: __pthread_joiner_wake
+
+2023-07-20 09:59:19 - Neovide panicked with the message 'Could not parse error code from neovim'. (File: src/bridge/handler.rs; Line: 85, Column: 22)
+   0: __mh_execute_header
+   1: __mh_execute_header
+   2: __mh_execute_header
+   3: __mh_execute_header
+   4: __mh_execute_header
+   5: __mh_execute_header
+   6: __mh_execute_header
+   7: __mh_execute_header
+   8: __mh_execute_header
+   9: __mh_execute_header
+  10: __mh_execute_header
+  11: __mh_execute_header
+  12: __mh_execute_header
+  13: __mh_execute_header
+  14: __mh_execute_header
+  15: __mh_execute_header
+  16: __mh_execute_header
+  17: __mh_execute_header
+  18: __pthread_joiner_wake
+
+2023-07-20 10:04:28 - Neovide panicked with the message 'Could not parse error code from neovim'. (File: src/bridge/handler.rs; Line: 85, Column: 22)
+   0: __mh_execute_header
+   1: __mh_execute_header
+   2: __mh_execute_header
+   3: __mh_execute_header
+   4: __mh_execute_header
+   5: __mh_execute_header
+   6: __mh_execute_header
+   7: __mh_execute_header
+   8: __mh_execute_header
+   9: __mh_execute_header
+  10: __mh_execute_header
+  11: __mh_execute_header
+  12: __mh_execute_header
+  13: __mh_execute_header
+  14: __mh_execute_header
+  15: __mh_execute_header
+  16: __mh_execute_header
+  17: __mh_execute_header
+  18: __pthread_joiner_wake
+
+2023-07-20 10:04:58 - Neovide panicked with the message 'Could not parse error code from neovim'. (File: src/bridge/handler.rs; Line: 85, Column: 22)
+   0: __mh_execute_header
+   1: __mh_execute_header
+   2: __mh_execute_header
+   3: __mh_execute_header
+   4: __mh_execute_header
+   5: __mh_execute_header
+   6: __mh_execute_header
+   7: __mh_execute_header
+   8: __mh_execute_header
+   9: __mh_execute_header
+  10: __mh_execute_header
+  11: __mh_execute_header
+  12: __mh_execute_header
+  13: __mh_execute_header
+  14: __mh_execute_header
+  15: __mh_execute_header
+  16: __mh_execute_header
+  17: __mh_execute_header
+  18: __pthread_joiner_wake
+
+2023-07-20 10:10:13 - Neovide panicked with the message 'Could not parse error code from neovim'. (File: src/bridge/handler.rs; Line: 85, Column: 22)
+   0: __mh_execute_header
+   1: __mh_execute_header
+   2: __mh_execute_header
+   3: __mh_execute_header
+   4: __mh_execute_header
+   5: __mh_execute_header
+   6: __mh_execute_header
+   7: __mh_execute_header
+   8: __mh_execute_header
+   9: __mh_execute_header
+  10: __mh_execute_header
+  11: __mh_execute_header
+  12: __mh_execute_header
+  13: __mh_execute_header
+  14: __mh_execute_header
+  15: __mh_execute_header
+  16: __mh_execute_header
+  17: __mh_execute_header
+  18: __pthread_joiner_wake
+
+2023-07-20 10:13:18 - Neovide panicked with the message 'Could not parse error code from neovim'. (File: src/bridge/handler.rs; Line: 85, Column: 22)
+   0: __mh_execute_header
+   1: __mh_execute_header
+   2: __mh_execute_header
+   3: __mh_execute_header
+   4: __mh_execute_header
+   5: __mh_execute_header
+   6: __mh_execute_header
+   7: __mh_execute_header
+   8: __mh_execute_header
+   9: __mh_execute_header
+  10: __mh_execute_header
+  11: __mh_execute_header
+  12: __mh_execute_header
+  13: __mh_execute_header
+  14: __mh_execute_header
+  15: __mh_execute_header
+  16: __mh_execute_header
+  17: __mh_execute_header
+  18: __pthread_joiner_wake
+
+2023-07-20 10:18:58 - Neovide panicked with the message 'Could not parse error code from neovim'. (File: src/bridge/handler.rs; Line: 85, Column: 22)
+   0: __mh_execute_header
+   1: __mh_execute_header
+   2: __mh_execute_header
+   3: __mh_execute_header
+   4: __mh_execute_header
+   5: __mh_execute_header
+   6: __mh_execute_header
+   7: __mh_execute_header
+   8: __mh_execute_header
+   9: __mh_execute_header
+  10: __mh_execute_header
+  11: __mh_execute_header
+  12: __mh_execute_header
+  13: __mh_execute_header
+  14: __mh_execute_header
+  15: __mh_execute_header
+  16: __mh_execute_header
+  17: __mh_execute_header
+  18: __pthread_joiner_wake
+
+2023-07-20 10:20:14 - Neovide panicked with the message 'Could not parse error code from neovim'. (File: src/bridge/handler.rs; Line: 85, Column: 22)
+   0: __mh_execute_header
+   1: __mh_execute_header
+   2: __mh_execute_header
+   3: __mh_execute_header
+   4: __mh_execute_header
+   5: __mh_execute_header
+   6: __mh_execute_header
+   7: __mh_execute_header
+   8: __mh_execute_header
+   9: __mh_execute_header
+  10: __mh_execute_header
+  11: __mh_execute_header
+  12: __mh_execute_header
+  13: __mh_execute_header
+  14: __mh_execute_header
+  15: __mh_execute_header
+  16: __mh_execute_header
+  17: __mh_execute_header
+  18: __pthread_joiner_wake
+
+2023-07-20 10:22:34 - Neovide panicked with the message 'Could not parse error code from neovim'. (File: src/bridge/handler.rs; Line: 85, Column: 22)
+   0: __mh_execute_header
+   1: __mh_execute_header
+   2: __mh_execute_header
+   3: __mh_execute_header
+   4: __mh_execute_header
+   5: __mh_execute_header
+   6: __mh_execute_header
+   7: __mh_execute_header
+   8: __mh_execute_header
+   9: __mh_execute_header
+  10: __mh_execute_header
+  11: __mh_execute_header
+  12: __mh_execute_header
+  13: __mh_execute_header
+  14: __mh_execute_header
+  15: __mh_execute_header
+  16: __mh_execute_header
+  17: __mh_execute_header
+  18: __pthread_joiner_wake
+
+2023-07-20 10:27:42 - Neovide panicked with the message 'Could not parse error code from neovim'. (File: src/bridge/handler.rs; Line: 85, Column: 22)
+   0: __mh_execute_header
+   1: __mh_execute_header
+   2: __mh_execute_header
+   3: __mh_execute_header
+   4: __mh_execute_header
+   5: __mh_execute_header
+   6: __mh_execute_header
+   7: __mh_execute_header
+   8: __mh_execute_header
+   9: __mh_execute_header
+  10: __mh_execute_header
+  11: __mh_execute_header
+  12: __mh_execute_header
+  13: __mh_execute_header
+  14: __mh_execute_header
+  15: __mh_execute_header
+  16: __mh_execute_header
+  17: __mh_execute_header
+  18: __pthread_joiner_wake
+
+2023-07-20 10:28:07 - Neovide panicked with the message 'Could not parse error code from neovim'. (File: src/bridge/handler.rs; Line: 85, Column: 22)
+   0: __mh_execute_header
+   1: __mh_execute_header
+   2: __mh_execute_header
+   3: __mh_execute_header
+   4: __mh_execute_header
+   5: __mh_execute_header
+   6: __mh_execute_header
+   7: __mh_execute_header
+   8: __mh_execute_header
+   9: __mh_execute_header
+  10: __mh_execute_header
+  11: __mh_execute_header
+  12: __mh_execute_header
+  13: __mh_execute_header
+  14: __mh_execute_header
+  15: __mh_execute_header
+  16: __mh_execute_header
+  17: __mh_execute_header
+  18: __pthread_joiner_wake
+
+2023-07-20 10:28:22 - Neovide panicked with the message 'Could not parse error code from neovim'. (File: src/bridge/handler.rs; Line: 85, Column: 22)
+   0: __mh_execute_header
+   1: __mh_execute_header
+   2: __mh_execute_header
+   3: __mh_execute_header
+   4: __mh_execute_header
+   5: __mh_execute_header
+   6: __mh_execute_header
+   7: __mh_execute_header
+   8: __mh_execute_header
+   9: __mh_execute_header
+  10: __mh_execute_header
+  11: __mh_execute_header
+  12: __mh_execute_header
+  13: __mh_execute_header
+  14: __mh_execute_header
+  15: __mh_execute_header
+  16: __mh_execute_header
+  17: __mh_execute_header
+  18: __pthread_joiner_wake
+
+2023-07-20 10:28:31 - Neovide panicked with the message 'Could not parse error code from neovim'. (File: src/bridge/handler.rs; Line: 85, Column: 22)
+   0: __mh_execute_header
+   1: __mh_execute_header
+   2: __mh_execute_header
+   3: __mh_execute_header
+   4: __mh_execute_header
+   5: __mh_execute_header
+   6: __mh_execute_header
+   7: __mh_execute_header
+   8: __mh_execute_header
+   9: __mh_execute_header
+  10: __mh_execute_header
+  11: __mh_execute_header
+  12: __mh_execute_header
+  13: __mh_execute_header
+  14: __mh_execute_header
+  15: __mh_execute_header
+  16: __mh_execute_header
+  17: __mh_execute_header
+  18: __pthread_joiner_wake
+
+2023-07-20 10:31:24 - Neovide panicked with the message 'Could not parse error code from neovim'. (File: src/bridge/handler.rs; Line: 85, Column: 22)
+   0: __mh_execute_header
+   1: __mh_execute_header
+   2: __mh_execute_header
+   3: __mh_execute_header
+   4: __mh_execute_header
+   5: __mh_execute_header
+   6: __mh_execute_header
+   7: __mh_execute_header
+   8: __mh_execute_header
+   9: __mh_execute_header
+  10: __mh_execute_header
+  11: __mh_execute_header
+  12: __mh_execute_header
+  13: __mh_execute_header
+  14: __mh_execute_header
+  15: __mh_execute_header
+  16: __mh_execute_header
+  17: __mh_execute_header
+  18: __pthread_joiner_wake
+

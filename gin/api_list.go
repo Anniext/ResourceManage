@@ -18,6 +18,8 @@ func (r *RouterGroup) List(c *gin.Context) {
 		UnitListGroup(c)
 	case "user":
 		UserListGroup(c)
+    case "rela":
+        RelaListGroup(c)
 	default:
 		log.Println("Error group name", groupName)
 	}
@@ -63,6 +65,21 @@ func UnitListGroup(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"unitlist": units, "count": count})
+}
+
+func RelaListGroup(c *gin.Context) {
+	arg := data.GetHeadBody{
+		Page:   c.Param("page"),
+		Limit:  c.Query("limit"),
+		Offset: c.Query("offset"),
+	}
+	rela, count, err := data.GetRelaList(&arg)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		// 错误信息500,把error发送
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"relalist": rela, "count": count})
 }
 
 func UserListGroup(c *gin.Context) {
