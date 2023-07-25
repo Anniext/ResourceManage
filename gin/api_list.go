@@ -1,6 +1,7 @@
 package services
 
 import (
+	"ResourceManage/api"
 	"ResourceManage/data"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -12,14 +13,14 @@ import (
 func (r *RouterGroup) List(c *gin.Context) {
 	groupName := GetGroupName(r)
 	switch groupName {
-	case "resource":
+	case RESOURCE:
 		FileListGroup(c)
-	case "unit":
+	case UNIT:
 		UnitListGroup(c)
-	case "user":
+	case BACKEND:
 		UserListGroup(c)
-    case "rela":
-        RelaListGroup(c)
+	case RELA:
+		RelaListGroup(c)
 	default:
 		log.Println("Error group name", groupName)
 	}
@@ -42,13 +43,12 @@ func FileListGroup(c *gin.Context) {
 		Offset: c.Query("offset"),
 		Delete: c.Query("delete"),
 	}
-	list, count, err := data.GetFileList(&arg)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		// 错误信息500,把error发送
+	filelist := data.GetFileList(&arg).(data.FileList)
+	if filelist.Error != nil {
+		c.JSON(http.StatusOK, api.JsonError(api.ErrCacheDate).JsonWithData(filelist.Error))
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"filelist": list, "count": count})
+	c.JSON(http.StatusOK, api.JsonData(filelist))
 }
 
 func UnitListGroup(c *gin.Context) {
@@ -58,13 +58,12 @@ func UnitListGroup(c *gin.Context) {
 		Offset: c.Query("offset"),
 	}
 	prmiss := c.MustGet("prmiss").(map[string]interface{})
-	units, count, err := data.GetUnitList(&arg, prmiss)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		// 错误信息500,把error发送
+    unitlist := data.GetUnitList(&arg, prmiss).(data.UnitList)
+	if unitlist.Error != nil {
+		c.JSON(http.StatusOK, api.JsonError(api.ErrCacheDate).JsonWithData(unitlist.Error))
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"unitlist": units, "count": count})
+	c.JSON(http.StatusOK, api.JsonData(unitlist))
 }
 
 func RelaListGroup(c *gin.Context) {
@@ -73,22 +72,25 @@ func RelaListGroup(c *gin.Context) {
 		Limit:  c.Query("limit"),
 		Offset: c.Query("offset"),
 	}
-	rela, count, err := data.GetRelaList(&arg)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		// 错误信息500,把error发送
+
+    list := data.GetRelaList(&arg).(data.RelaList)
+	if list.Error != nil {
+		c.JSON(http.StatusOK, api.JsonError(api.ErrCacheDate).JsonWithData(list.Error))
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"relalist": rela, "count": count})
+	c.JSON(http.StatusOK, api.JsonData(list))
 }
 
 func UserListGroup(c *gin.Context) {
 	db := c.MustGet("db").(*gorm.DB)
-	units, err := data.GetUserList(db)
+	list, err := data.GetUserList(db)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		// 错误信息500,把error发送
+		c.JSON(http.StatusOK, api.JsonError(api.ErrCacheDate).JsonWithData(err))
 		return
 	}
-	c.JSON(http.StatusOK, units)
+	c.JSON(http.StatusOK, api.JsonData(
+		gin.H{
+			"filelist": list,
+		}),
+	)
 }

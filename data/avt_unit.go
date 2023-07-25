@@ -13,80 +13,85 @@ type NamePrmiss struct {
 	Primss map[string]interface{}
 }
 
-func CreateUnit(unit *model.AvtUnit) string {
+type UnitList struct {
+    Units []model.AvtUnit
+    Count int64
+    Error error
+}
+
+func CreateUnit(unit *model.AvtUnit) (bool, string) {
 	unit.CreateTime = time.Now()
 	unit.UpdateTime = time.Now()
-	if CacheUnit.Get(unit.Name) != nil {
-		return "Unit name already exists"
+    id := CacheUnit.GetID(unit.Name)
+	if CacheUnit.Get(id) != nil {
+		return false, "Unit name already exists"
 	}
 	if err := CacheUnit.Sync(unit); err != nil {
 		log.Println("CacheFile Sync err:", err)
-		return err.Error()
+		return false, err.Error()
 	}
 	CacheUnit.Set(unit)
-	return ""
+	return true, ""
 }
 
-func GetUnit(name string) (*model.AvtUnit, string) {
-	if unit := CacheUnit.Get(name); unit != nil {
+func GetUnit(id int64) (*model.AvtUnit, string) {
+	if unit := CacheUnit.Get(id); unit != nil {
 		return unit, ""
 	}
 	return nil, "Unit does not exist"
 }
 
-func GetUnitList(arg *GetHeadBody, prmiss map[string]interface{}) ([]model.AvtUnit, int64, error) {
-	var units []model.AvtUnit
+func GetUnitList(arg *GetHeadBody, prmiss map[string]interface{}) (interface{}) {
+	var unitlist UnitList
 	//offset, _ := strconv.Atoi(arg.Offset)
 	limit, _ := strconv.Atoi(arg.Limit)
 	page, _ := strconv.Atoi(arg.Page)
 	level := int64(prmiss["level"].(float64))
 	userid := int64(prmiss["user_id"].(float64))
 	//v_delete, _ := strconv.ParseInt(arg.Delete, 10, 64)
-	if err := query.AvtUnit.Offset((page * limit) - limit).Limit(limit).Where(query.AvtUnit.UserID.
-		Eq(userid)).Where(query.AvtUnit.Level.Gt(level)).Or(query.AvtUnit.Level.Eq(level)).Scan(&units); err != nil {
-		return nil, 0, err
+	if unitlist.Error = query.AvtUnit.Offset((page * limit) - limit).Limit(limit).Where(query.AvtUnit.UserID.
+		Eq(userid)).Where(query.AvtUnit.Level.Gt(level)).Or(query.AvtUnit.Level.Eq(level)).Scan(&unitlist.Units); unitlist.Error != nil {
+		return unitlist
 	}
-	count, err := query.AvtUnit.Where(query.AvtUnit.UserID.
+	unitlist.Count, unitlist.Error = query.AvtUnit.Where(query.AvtUnit.UserID.
 		Eq(userid)).Where(query.AvtUnit.Level.Gt(level)).Or(query.AvtUnit.Level.Eq(level)).Count()
-	if err != nil {
-		return nil, 0, err
+	if unitlist.Error != nil {
+		return unitlist
 	}
-	return units, count, nil
+	return unitlist
 }
 
-func UpdateUnit(name string, unit *model.AvtUnit) string {
-	existingUnit, err := GetUnit(name)
+func UpdateUnit(name string, unit *model.AvtUnit) (bool, string) {
+	existingUnit, err := GetUnit(CacheUnit.GetID(name))
 	if err != "" {
-		return err
+		return false, err
 	}
 	existingUnit.Name = unit.Name
 	existingUnit.UpdateTime = time.Now()
 	existingUnit.Address = unit.Address
 	CacheUnit.Update(existingUnit)
-
-	return ""
+	return true, "" 
 }
 
-func DeleteUnit(i interface{}) string {
+func DeleteUnit(i interface{}) (bool, string) {
 	if p, ok := i.(NamePrmiss); ok {
-		cache := CacheUnit.Get(p.Name)
+		cache := CacheUnit.Get(CacheUnit.GetID(p.Name))
 		level := p.Primss["level"].(float64)
 		if cache == nil {
-			return "Unit does not exist"
+			return false, "Unit does not exist"
 		}
 		if cache.Level <= int64(level) {
-			return "Permission too low to delete"
+			return false, "Permission too low to delete"
 		}
 		if _, err := query.AvtUnit.Delete(cache); err != nil {
-			log.Println("avt_unit表数据同步错误：", err)
-			return err.Error()
+			return false, err.Error()
 		}
 		CacheUnit.Clear()
 		if err := GetUnitData(); err != nil {
-			return "GetUnitData err:" + err.Error()
+			return false, "GetUnitData err:" + err.Error()
 		}
 	} else {
-		return "interface Reflection err"
+		return false, "interface Reflection err"
 	}
-	return ""
+	return true, ""
 }

@@ -8,13 +8,15 @@ import (
 )
 
 type UnitMap struct {
-	data map[string]*model.AvtUnit
-	lock sync.RWMutex
+	dataName map[string]int64
+	data     map[int64]*model.AvtUnit
+	lock     sync.RWMutex
 }
 
 func NewUnitMap() *UnitMap {
 	return &UnitMap{
-		data: make(map[string]*model.AvtUnit),
+		data:     make(map[int64]*model.AvtUnit),
+		dataName: make(map[string]int64),
 	}
 }
 
@@ -40,23 +42,30 @@ func LoadUnitData() (err error) {
 
 func (m *UnitMap) Set(bu *model.AvtUnit) {
 	m.lock.Lock()
-	m.data[bu.Name] = bu
+	m.data[bu.ID] = bu
+    m.dataName[bu.Name] = bu.ID
 	m.lock.Unlock()
 }
 
-func (m *UnitMap) Get(name string) *model.AvtUnit {
+func (m *UnitMap) Get(id int64) *model.AvtUnit {
 	m.lock.RLock()
 	defer m.lock.RUnlock()
-	return m.data[name]
+	return m.data[id]
 }
 
-//	func (m *UnitMap) Delete(name string) {
-//		m.lock.Lock()
-//		defer m.lock.Unlock()
-//		if _, ok := m.data[name]; ok {
-//			delete(m.data, name)
-//		}
-//	}
+func (m *UnitMap) GetID(name string) int64 {
+    m.lock.RLock()
+    defer m.lock.RUnlock()
+    return m.dataName[name]
+}
+
+func (m *UnitMap) Delete(id int64) {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+	if _, ok := m.data[id]; ok {
+		delete(m.data, id)
+	}
+}
 func (m *UnitMap) Sync(unit *model.AvtUnit) error {
 	m.lock.Lock()
 	defer m.lock.Unlock()
@@ -70,16 +79,21 @@ func (m *UnitMap) Sync(unit *model.AvtUnit) error {
 func (m *UnitMap) Clear() {
 	m.lock.Lock()
 	defer m.lock.Unlock()
-	m.data = make(map[string]*model.AvtUnit)
+	m.data = make(map[int64]*model.AvtUnit)
+    m.dataName = make(map[string]int64)
 }
 
 func (m *UnitMap) Update(unit *model.AvtUnit) {
 	m.lock.Lock()
 	defer m.lock.Unlock()
-	if _, ok := m.data[unit.Name]; ok {
-		delete(m.data, unit.Name)
+	if _, ok := m.data[unit.ID]; ok {
+		delete(m.data, unit.ID)
+        delete(m.dataName, unit.Name)
+		m.data[unit.ID] = unit
+        m.dataName[unit.Name] = unit.ID
+        
 	}
-	m.data[unit.Name] = unit
+	m.data[unit.ID] = unit
 	_, err := query.AvtUnit.Where(query.AvtUnit.ID.Eq(unit.ID)).Updates(map[string]interface{}{
 		"name":        unit.Name,
 		"address":     unit.Address,

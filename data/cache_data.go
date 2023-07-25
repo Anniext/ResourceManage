@@ -6,6 +6,11 @@ import (
 	"net/http"
 )
 
+type ReList struct {
+    List interface{}
+    Count int64
+}
+
 var (
 	CacheFile         *FileMap
 	CacheUnit         *UnitMap
@@ -40,7 +45,7 @@ func SystemDataInit() {
 }
 
 func GetFileData() (err error) {
-	_, err = http.Get("http://127.0.0.1" + config.Configs.AppPort + "/api/cache/LoadFileData")
+	_, err = http.Get("http://" + config.Configs.Dev.Router.Host + "/api/cache/LoadFileData")
 	if err != nil {
 		log.Println("file_data请求失败:", err)
 	}
@@ -48,7 +53,7 @@ func GetFileData() (err error) {
 }
 
 func GetUnitData() (err error) {
-	_, err = http.Get("http://127.0.0.1" + config.Configs.AppPort + "/api/cache/LoadUnitData")
+    _, err = http.Get("http://" + config.Configs.Dev.Router.Host + "/api/cache/LoadUnitData")
 	if err != nil {
 		log.Println("unit_data请求失败:", err)
 	}
@@ -56,14 +61,14 @@ func GetUnitData() (err error) {
 }
 
 func GetBackendUserData() (err error) {
-	_, err = http.Get("http://127.0.0.1" + config.Configs.AppPort + "/api/cache/LoadBackendUserData")
+    _, err = http.Get("http://" + config.Configs.Dev.Router.Host + "/api/cache/LoadBackendUserData")
 	if err != nil {
 		log.Println("file_data请求失败:", err)
 	}
 	return
 }
 func GetRelaUnitFileData() (err error) {
-	_, err = http.Get("http://127.0.0.1" + config.Configs.AppPort + "/api/cache/LoadRelaUnitFileData")
+    _, err = http.Get("http://" + config.Configs.Dev.Router.Host + "/api/cache/LoadRelaUnitFileData")
 	if err != nil {
 		log.Println("file_data请求失败:", err)
 	}

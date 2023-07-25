@@ -8,33 +8,78 @@ import (
 	"time"
 )
 
-func CreateRela(rela *model.RelaUnitFile) string {
-	rela.CreateTime = time.Now()
-	rela.UpdateTime = time.Now()
-    cache := CacheRelaUnitFile.Get(rela.UnitID)
-    if cache != nil && cache.FileID == rela.FileID{
-        return "relaunitfile already exists"
-    }
-	if err := CacheRelaUnitFile.Sync(rela); err != nil {
-		log.Println("CacheFile Sync err:", err)
-		return err.Error()
-	}
-	CacheRelaUnitFile.Set(rela)
-	return ""
+type RelaList struct {
+	Relas []model.RelaUnitFile
+	Count int64
+	Error error
 }
 
-func GetRelaList(arg *GetHeadBody) ([]model.RelaUnitFile, int64, error) {
-	var rela []model.RelaUnitFile
+func CreateRela(rela *model.RelaUnitFile) (bool, string) {
+	rela.CreateTime = time.Now()
+	rela.UpdateTime = time.Now()
+	cache := CacheRelaUnitFile.Get(rela.UnitID)
+	if cache != nil && cache.FileID == rela.FileID {
+		return false, "relaunitfile already exists"
+	}
+	if err := CacheRelaUnitFile.Sync(rela); err != nil {
+		log.Println("CacheFile Sync err:", err)
+		return false, err.Error()
+	}
+	CacheRelaUnitFile.Set(rela)
+	return true, ""
+}
+
+func GetRelaList(arg *GetHeadBody) interface{} {
+	var relalist RelaList
 	//offset, _ := strconv.Atoi(arg.Offset)
 	limit, _ := strconv.Atoi(arg.Limit)
 	page, _ := strconv.Atoi(arg.Page)
 	//v_delete, _ := strconv.ParseInt(arg.Delete, 10, 64)
-	if err := query.RelaUnitFile.Offset((page * limit) - limit).Limit(limit).Scan(&rela); err != nil {
-		return nil, 0, err
+	if relalist.Error = query.RelaUnitFile.Offset((page * limit) - limit).Limit(limit).Scan(&relalist.Relas); relalist.Error != nil {
+		return relalist
 	}
-	count, err := query.RelaUnitFile.Count()
-	if err != nil {
-		return nil, 0, err
+	relalist.Count, relalist.Error = query.RelaUnitFile.Count()
+	if relalist.Error != nil {
+		return relalist
 	}
-	return rela, count, nil
+	return relalist
+}
+
+func DeleteRela(file string, unit string) (bool, string) {
+	fileId, _ := strconv.ParseInt(file, 10, 64)
+	unitId, _ := strconv.ParseInt(unit, 10, 64)
+    var re *model.RelaUnitFile 
+    query.RelaUnitFile.Where(query.RelaUnitFile.FileID.Eq(fileId),
+		query.RelaUnitFile.UnitID.Eq(unitId)).Scan(&re)
+	if _, err := query.RelaUnitFile.Delete (re); err != nil {
+		return false, err.Error()
+	}
+	CacheUnit.Clear()
+	if err := GetUnitData(); err != nil {
+		return false, "GetUnitData err:" + err.Error()
+	}
+	return true, ""
+}
+
+func GetRelaUnitFile(id int64, target string) (interface{}, string) {
+	if target == "unit" {
+		var unitList []*model.AvtUnit
+		query.AvtUnit.Where(query.AvtUnit.ID.Eq(id)).Scan(&unitList)
+		return unitList, ""
+	} else if target == "file" {
+		var fileList []*model.AvtFile
+		query.AvtFile.Where(query.AvtFile.ID.Eq(id)).Scan(&fileList)
+		return fileList, ""
+	}
+	return nil, "File does not exist"
+}
+
+func UpdateRela(unitId string, rela *model.RelaUnitFile) (bool, string) {
+    uid, _ := strconv.ParseInt(unitId, 10, 64)
+    var re model.RelaUnitFile 
+    query.RelaUnitFile.Where(query.RelaUnitFile.UnitID.Eq(uid)).Scan(&re)
+	re.FileID = rela.FileID
+	re.UpdateTime  = time.Now()
+	return true, "" 
+    // 省略1w字
 }

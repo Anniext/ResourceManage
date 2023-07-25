@@ -15,7 +15,7 @@ type BackendUserMap struct {
 func NewBackendUserMap() *BackendUserMap {
 	return &BackendUserMap{
 		data: make(map[string]*model.SysBackendUser),
-	}
+    }
 }
 
 func LoadBackendUserData() (err error) {

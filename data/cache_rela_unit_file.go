@@ -9,12 +9,14 @@ import (
 
 type RelaUnitFileMap struct {
 	data map[int64]*model.RelaUnitFile
+    dataName map[string]int64
 	lock sync.RWMutex
 }
 
 func NewRelaUnitFileMap() *RelaUnitFileMap {
 	return &RelaUnitFileMap{
 		data: make(map[int64]*model.RelaUnitFile),
+        dataName: make(map[string]int64),
 	}
 }
 
@@ -39,14 +41,21 @@ func LoadRelaUnitFileData() (err error) {
 }
 func (m *RelaUnitFileMap) Set(bu *model.RelaUnitFile) {
 	m.lock.Lock()
-	m.data[bu.UnitID] = bu
+	m.data[bu.ID] = bu
 	m.lock.Unlock()
 }
 
-func (m *RelaUnitFileMap) Get(unitID int64) *model.RelaUnitFile {
+func (m *RelaUnitFileMap) Get(id int64) *model.RelaUnitFile {
 	m.lock.RLock()
 	defer m.lock.RUnlock()
-	return m.data[unitID]
+	return m.data[id]
+}
+
+
+func (m *RelaUnitFileMap) GetID (name string) int64 {
+    m.lock.RLock()
+    defer m.lock.RUnlock()
+    return m.dataName[name]
 }
 
 func (m *RelaUnitFileMap) Sync(rela *model.RelaUnitFile) error {

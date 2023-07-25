@@ -3,6 +3,7 @@ module ResourceManage
 go 1.20
 
 require (
+	github.com/bytedance/sonic v1.8.0
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-gonic/gin v1.9.0
 	gorm.io/driver/mysql v1.5.1
@@ -12,7 +13,6 @@ require (
 )
 
 require (
-	github.com/bytedance/sonic v1.8.0 // indirect
 	github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect

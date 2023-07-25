@@ -19,50 +19,57 @@ type GetHeadBody struct {
 	Delete string `json:"delete"`
 }
 
-func CreateFile(file *model.AvtFile) string {
+type FileList struct {
+	Files []model.AvtFile
+	Count int64
+	Error error
+}
+
+func CreateFile(file *model.AvtFile) (bool, string) {
 	file.CreateTime = time.Now()
 	file.UpdateTime = time.Now()
 	file.IsDelete = 0
 	file.Status = 0
 	file.File = file.Name + "." + file.Type
-	if CacheFile.Get(file.Name) != nil {
-		return "File name already exists"
+	id := CacheFile.GetID(file.Name)
+	if CacheFile.Get(id) != nil {
+		return false, "File name already exists"
 	}
 	if err := CacheFile.Sync(file); err != nil {
 		log.Println("CacheFile Sync err:", err)
-		return err.Error()
+		return false, err.Error()
 	}
 	CacheFile.Set(file)
-	return ""
+	return true, ""
 }
 
-func GetFile(name string) (*model.AvtFile, string) {
-	if file := CacheFile.Get(name); file != nil {
+func GetFile(id int64) (*model.AvtFile, string) {
+	if file := CacheFile.Get(id); file != nil {
 		return file, ""
 	}
 	return nil, "File does not exist"
 }
 
-func GetFileList(arg *GetHeadBody) ([]model.AvtFile, int64, error) {
-	var files []model.AvtFile
+func GetFileList(arg *GetHeadBody) interface{} {
+	var filelist FileList
 	//offset, _ := strconv.Atoi(arg.Offset)
 	limit, _ := strconv.Atoi(arg.Limit)
 	page, _ := strconv.Atoi(arg.Page)
 	v_delete, _ := strconv.ParseInt(arg.Delete, 10, 64)
-	if err := query.AvtFile.Offset((page * limit) - limit).Limit(limit).Where(query.AvtFile.IsDelete.Eq(v_delete)).Scan(&files); err != nil {
-		return nil, 0, err
+	if filelist.Error = query.AvtFile.Offset((page * limit) - limit).Limit(limit).Where(query.AvtFile.IsDelete.Eq(v_delete)).Scan(&filelist.Files); filelist.Error != nil {
+		return filelist
 	}
-	count, err := query.AvtFile.Where(query.AvtFile.IsDelete.Eq(v_delete)).Count()
-	if err != nil {
-		return nil, 0, err
+	filelist.Count, filelist.Error = query.AvtFile.Where(query.AvtFile.IsDelete.Eq(v_delete)).Count()
+	if filelist.Error != nil {
+		return filelist
 	}
-	return files, count, nil
+	return filelist
 }
 
-func UpdateFile(name string, file *model.AvtFile) string {
-	existingFile, err := GetFile(name)
+func UpdateFile(name string, file *model.AvtFile) (bool, string) {
+	existingFile, err := GetFile(CacheFile.GetID(name))
 	if err != "" {
-		return err
+		return false, err
 	}
 	existingFile.Name = name
 	existingFile.FilePath = file.FilePath
@@ -71,23 +78,22 @@ func UpdateFile(name string, file *model.AvtFile) string {
 	existingFile.Status = file.Status
 	existingFile.File = name + "." + existingFile.Type
 	CacheFile.Update(existingFile)
-	return ""
+	return true, ""
 }
 
-func DeleteFile(name string) string {
-	cache := CacheFile.Get(name)
+func DeleteFile(name string) (bool, string) {
+	cache := CacheFile.Get(CacheFile.GetID(name))
 	if cache == nil {
-		return "File does not exist"
+		return false, "File does not exist"
 	}
 	if _, err := query.AvtFile.Delete(cache); err != nil {
-		log.Println("avt_file表数据同步错误：", err)
-		return err.Error()
+		return false, err.Error()
 	}
 	CacheFile.Clear()
 	if err := GetFileData(); err != nil {
-		return "GetFileData err:" + err.Error()
+		return false, "GetFileData err:" + err.Error()
 	}
-	return ""
+	return true, ""
 }
 
 func UploadFile(handler *multipart.FileHeader, f multipart.File, fileData *model.AvtFile) error {

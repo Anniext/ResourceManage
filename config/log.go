@@ -15,21 +15,16 @@ type LogConfBody struct {
 	Warning *log.Logger
 }
 
-var (
-	Logs LogConfBody
-	Log  LogsInterface
-)
-
-func NewLog() *LogPath {
-	return &LogPath{Path: "./log/log.txt"}
-}
-
 type LogsInterface interface {
 	Write()
 	Detection()
 }
 
-// 写入配置的方法
+var (
+	Logs LogConfBody
+	Log  LogsInterface
+)
+
 func (c *LogPath) Write() {
 	file, _ := os.Create(c.Path) //需要运行读取配置文件函数之后
 	Logs.Info = log.New(file, "[Info]", log.Ldate|log.Ltime|log.Lshortfile)
@@ -39,7 +34,6 @@ func (c *LogPath) Write() {
 	log.Println("<----------------------------->")
 }
 
-// Detection 检测日志方法文件大小,超过10M则重命名,创建新的日志文件
 func (c *LogPath) Detection() {
 	maxSize := 1024 * 1024 * 10 // 10M
 	fileInfo, err := os.Stat(c.Path)
@@ -47,12 +41,10 @@ func (c *LogPath) Detection() {
 		Logs.Error.Println("Failed to get log file information:", err)
 	}
 	if fileInfo.Size() > int64(maxSize) {
-		// 重命名日志文件
 		err = os.Rename(c.Path, c.Path+".bak")
 		if err != nil {
 			Logs.Error.Println("Failed to rename log file:", err)
 		}
-		// 创建新的日志文件
 		_, err := os.Create(c.Path)
 		Logs.Info.Println("Log file too large, recreate new log file")
 		if err != nil {
