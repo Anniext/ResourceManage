@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"regexp"
+	"strconv"
 )
 
 func (r *RouterGroup) List(c *gin.Context) {
@@ -58,7 +59,7 @@ func UnitListGroup(c *gin.Context) {
 		Offset: c.Query("offset"),
 	}
 	prmiss := c.MustGet("prmiss").(map[string]interface{})
-    unitlist := data.GetUnitList(&arg, prmiss).(data.UnitList)
+	unitlist := data.GetUnitList(&arg, prmiss).(data.UnitList)
 	if unitlist.Error != nil {
 		c.JSON(http.StatusOK, api.JsonError(api.ErrCacheDate).JsonWithData(unitlist.Error))
 		return
@@ -72,8 +73,11 @@ func RelaListGroup(c *gin.Context) {
 		Limit:  c.Query("limit"),
 		Offset: c.Query("offset"),
 	}
+	id := c.Query("id")
+	target := c.Query("target")
+	idt, _ := strconv.ParseInt(id, 10, 64)
 
-    list := data.GetRelaList(&arg).(data.RelaList)
+	list := data.GetRelaList(&arg, idt, target).(data.RelaList)
 	if list.Error != nil {
 		c.JSON(http.StatusOK, api.JsonError(api.ErrCacheDate).JsonWithData(list.Error))
 		return
