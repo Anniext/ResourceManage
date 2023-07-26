@@ -61,6 +61,7 @@ func (m *BackendUserMap) Update(user *model.SysBackendUser) {
 		"user_name": user.UserName,
 		"status":    user.Status,
 		"email":     user.Email,
+		"unit_id":   user.UnitID,
 	})
 	if err != nil {
 		log.Println("avt_file表数据更新错误：", err)

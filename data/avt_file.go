@@ -20,7 +20,7 @@ type GetHeadBody struct {
 }
 
 type FileList struct {
-	Files []model.AvtFile
+	Files []*model.AvtFile
 	Count int64
 	Error error
 }
@@ -30,8 +30,7 @@ func CreateFile(file *model.AvtFile) (bool, string) {
 	file.UpdateTime = time.Now()
 	file.IsDelete = 0
 	file.File = file.Name + "." + file.Type
-	id := CacheFile.GetID(file.Name)
-	if CacheFile.Get(id) != nil {
+	if CacheFile.Get(CacheFile.GetID(file.Name)) != nil {
 		return false, "File name already exists"
 	}
 	if err := CacheFile.Sync(file); err != nil {
@@ -43,7 +42,7 @@ func CreateFile(file *model.AvtFile) (bool, string) {
 }
 
 func GetFile(id int64) (*model.AvtFile, string) {
-	if file := CacheFile.Get(id); file != nil {
+	if file, _ := query.AvtFile.Where(query.AvtFile.ID.Eq(id)).Preload(query.AvtFile.UnitList).First(); file != nil {
 		return file, ""
 	}
 	return nil, "File does not exist"
@@ -55,7 +54,11 @@ func GetFileList(arg *GetHeadBody) interface{} {
 	limit, _ := strconv.Atoi(arg.Limit)
 	page, _ := strconv.Atoi(arg.Page)
 	v_delete, _ := strconv.ParseInt(arg.Delete, 10, 64)
-	if filelist.Error = query.AvtFile.Offset((page * limit) - limit).Limit(limit).Where(query.AvtFile.IsDelete.Eq(v_delete)).Scan(&filelist.Files); filelist.Error != nil {
+	if filelist.Files, filelist.Error = query.AvtFile.
+		Offset((page * limit) - limit).Limit(limit).
+		Preload(query.AvtFile.UnitList).
+		Where(query.AvtFile.IsDelete.Eq(v_delete)).
+		Find(); filelist.Error != nil {
 		return filelist
 	}
 	filelist.Count, filelist.Error = query.AvtFile.Where(query.AvtFile.IsDelete.Eq(v_delete)).Count()

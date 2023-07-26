@@ -18,8 +18,8 @@ func (r *RouterGroup) SetRouter() {
 		SetUnit(r)
 	case "user":
 		SetUser(r)
-    case "rela":
-        SetRela(r)
+	case "rela":
+		SetRela(r)
 	default:
 		log.Println("Error group name", groupName)
 	}
@@ -45,8 +45,8 @@ func SetUnit(r *RouterGroup) {
 func SetUser(r *RouterGroup) {
 	r.POST("/create", UserManager.Create)
 	r.GET("/get", UserManager.Get)
-	r.GET("/list/:delete_id", UserManager.List)
-	r.PUT("/update/:id", UserManager.Update)
+	r.GET("/list", UserManager.List)
+	r.PUT("/update", UserManager.Update)
 	r.DELETE("/delete/:id", UserManager.Delete)
 }
 

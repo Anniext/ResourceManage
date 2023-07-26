@@ -4,10 +4,9 @@ import (
 	"ResourceManage/api"
 	"ResourceManage/data"
 	"ResourceManage/model"
+	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
-	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 )
 
 func (r *RouterGroup) Update(c *gin.Context) {
@@ -69,15 +68,13 @@ func RelaUpdateGroup(c *gin.Context) {
 }
 
 func UserUpdateGroup(c *gin.Context) {
-	db := c.MustGet("db").(*gorm.DB)
-	id := c.Param("id")
-
+	name := c.Query("name")
 	var user model.SysBackendUser
 	if err := c.ShouldBind(&user); err != nil {
 		c.JSON(http.StatusOK, api.JsonError(api.ErrServer).JsonWithData(err))
 		return
 	}
-	if err := data.UpdateUser(id, &user, db); err != "" {
+	if err := data.UpdateUser(name, &user); err != "" {
 		c.JSON(http.StatusOK, api.JsonError(api.ErrCacheDate).JsonWithData(err))
 		return
 	}

@@ -3,7 +3,6 @@ package data
 import (
 	"ResourceManage/model"
 	"ResourceManage/query"
-	"fmt"
 	"log"
 	"strconv"
 	"time"
@@ -32,28 +31,16 @@ func CreateRela(rela *model.RelaUnitFile) (bool, string) {
 
 func GetRelaList(arg *GetHeadBody, idt int64, target string) interface{} {
 	var relalist RelaList
-	var test interface{}
 	//offset, _ := strconv.Atoi(arg.Offset)
 	limit, _ := strconv.Atoi(arg.Limit)
 	page, _ := strconv.Atoi(arg.Page)
 	//v_delete, _ := strconv.ParseInt(arg.Delete, 10, 64)
 	if target == "file" {
-		fa := query.AvtFile.As("fa")
-		ua := query.AvtUnit.As("ua")
-		query.RelaUnitFile.
-			Offset((page*limit)-limit).
-			Limit(limit).
-			//Select(fa.Name, ua.Name).
-			LeftJoin(fa, fa.ID.EqCol(query.RelaUnitFile.FileID)).
-			LeftJoin(ua, ua.ID.EqCol(query.RelaUnitFile.UnitID)).
-			Where(query.RelaUnitFile.FileID.Eq(idt)).Scan(&test)
-		fmt.Println(test)
-		//if relalist.Error = query.RelaUnitFile.Offset((page * limit) - limit).Limit(limit).Where(query.RelaUnitFile.FileID.
-		//	Eq(idt)).Scan(&relalist.Relas); relalist.Error != nil {
-		//	return relalist
-		//}
-
-		relalist.Count, relalist.Error = query.RelaUnitFile.Where(query.RelaUnitFile.FileID.Eq(idt)).Count()
+		if relalist.Error = query.RelaUnitFile.Select(query.RelaUnitFile.UnitID, query.RelaUnitFile.FileID).Offset((page * limit) - limit).Limit(limit).Where(query.RelaUnitFile.FileID.Eq(idt)).
+			Scan(&relalist.Relas); relalist.Error != nil {
+			return relalist
+		}
+		relalist.Count, relalist.Error = query.RelaUnitFile.Where(query.RelaUnitFile.UnitID.Eq(idt)).Count()
 	} else if target == "unit" {
 		if relalist.Error = query.RelaUnitFile.Select(query.RelaUnitFile.UnitID, query.RelaUnitFile.FileID).Offset((page * limit) - limit).Limit(limit).Where(query.RelaUnitFile.UnitID.Eq(idt)).
 			Scan(&relalist.Relas); relalist.Error != nil {

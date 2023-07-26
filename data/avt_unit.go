@@ -22,15 +22,20 @@ type UnitList struct {
 func CreateUnit(unit *model.AvtUnit) (bool, string) {
 	unit.CreateTime = time.Now()
 	unit.UpdateTime = time.Now()
-	id := CacheUnit.GetID(unit.Name)
-	if CacheUnit.Get(id) != nil {
+	if CacheUnit.Get(CacheUnit.GetID(unit.Name)) != nil {
 		return false, "Unit name already exists"
 	}
 	if err := CacheUnit.Sync(unit); err != nil {
 		log.Println("CacheFile Sync err:", err)
 		return false, err.Error()
 	}
-	CacheUnit.Set(unit)
+	newUnit, _ := query.AvtUnit.
+		Where(query.AvtUnit.Name.
+			Eq(unit.Name)).
+		Preload(query.AvtUnit.FileList,
+			query.AvtUnit.SubUnitList, query.AvtUnit.UserList).
+		First()
+	CacheUnit.Set(newUnit)
 	return true, ""
 }
 
@@ -91,11 +96,12 @@ func UpdateUnit(name string, unit *model.AvtUnit) (bool, string) {
 func DeleteUnit(i interface{}) (bool, string) {
 	if p, ok := i.(NamePrmiss); ok {
 		cache := CacheUnit.Get(CacheUnit.GetID(p.Name))
-		level := p.Primss["level"].(float64)
+		unid := int64(p.Primss["unit_id"].(float64))
+		ucache, _ := query.AvtUnit.Where(query.AvtUnit.ID.Eq(unid)).First()
 		if cache == nil {
 			return false, "Unit does not exist"
 		}
-		if cache.Level <= int64(level) {
+		if cache.Level <= ucache.Level {
 			return false, "Permission too low to delete"
 		}
 		if _, err := query.AvtUnit.Delete(cache); err != nil {

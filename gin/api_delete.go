@@ -3,10 +3,10 @@ package services
 import (
 	"ResourceManage/api"
 	"ResourceManage/data"
-	"log"
-	"net/http"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
+	"log"
+	"net/http"
 )
 
 func (r *RouterGroup) Delete(c *gin.Context) {
@@ -18,8 +18,8 @@ func (r *RouterGroup) Delete(c *gin.Context) {
 		UnitDeleteGroup(c)
 	case BACKEND:
 		UserDeleteGroup(c)
-    case RELA:
-        RelaDeleteGroup(c)
+	case RELA:
+		RelaDeleteGroup(c)
 	default:
 		log.Println("Error group name", groupName)
 	}
@@ -36,12 +36,11 @@ func FileDeleteGroup(c *gin.Context) {
 
 func UnitDeleteGroup(c *gin.Context) {
 	name := c.Query("name")
-    var prmiss interface {}
+	var prmiss interface{}
 	if prmiss = c.MustGet("prmiss"); prmiss == nil {
 		c.JSON(http.StatusOK, api.JsonError(api.JwtValidationErr).JsonWithData("令牌到期"))
 		return
-    }
-
+	}
 	if ok, err := data.DeleteUnit(data.NamePrmiss{
 		Name:   name,
 		Primss: prmiss.(map[string]interface{}),

@@ -4,7 +4,6 @@ import (
 	"ResourceManage/api"
 	"ResourceManage/data"
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 	"log"
 	"net/http"
 	"regexp"
@@ -86,15 +85,15 @@ func RelaListGroup(c *gin.Context) {
 }
 
 func UserListGroup(c *gin.Context) {
-	db := c.MustGet("db").(*gorm.DB)
-	list, err := data.GetUserList(db)
+	id := c.Query("id")
+	list, err := data.GetUserList(id)
 	if err != nil {
 		c.JSON(http.StatusOK, api.JsonError(api.ErrCacheDate).JsonWithData(err))
 		return
 	}
 	c.JSON(http.StatusOK, api.JsonData(
 		gin.H{
-			"filelist": list,
+			"userlist": list,
 		}),
 	)
 }

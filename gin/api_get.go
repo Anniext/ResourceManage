@@ -35,7 +35,7 @@ func FileGetGroup(c *gin.Context) {
 	var file *model.AvtFile
 	var err string
 
-    // 猜猜为啥多写一道，嘿嘿，就是玩儿
+	// 猜猜为啥多写一道，嘿嘿，就是玩儿
 	if query := utils.LimitParameter(name, id); query != "" {
 		if queryType == "name" {
 			id := data.CacheFile.GetID(query)
@@ -65,8 +65,7 @@ func UnitGetGroup(c *gin.Context) {
 
 	if query := utils.LimitParameter(name, id); query != "" {
 		if queryType == "name" {
-			id := data.CacheUnit.GetID(query)
-			unit, err = data.GetUnit(id)
+			unit, err = data.GetUnit(data.CacheUnit.GetID(query))
 		} else if queryType == "id" {
 			id, _ := strconv.ParseInt(query, 10, 64)
 			unit, err = data.GetUnit(id)
@@ -84,9 +83,9 @@ func UnitGetGroup(c *gin.Context) {
 
 func UserGetGroup(c *gin.Context) {
 	name := c.Query("name")
-	user, err := data.GetUser(name)
-	if err != "" {
-		c.JSON(http.StatusOK, api.JsonData(api.ErrCacheDate).JsonWithData(err))
+	var user model.SysBackendUser
+	if ok, err := data.GetUser(&user, name); !ok {
+		c.JSON(http.StatusOK, api.JsonError(api.ErrCacheDate).JsonWithData(err))
 		return
 	}
 	c.JSON(http.StatusOK, api.JsonData(user))

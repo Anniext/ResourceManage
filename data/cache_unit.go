@@ -89,11 +89,7 @@ func (m *UnitMap) Update(unit *model.AvtUnit) {
 	if _, ok := m.data[unit.ID]; ok {
 		delete(m.data, unit.ID)
 		delete(m.dataName, unit.Name)
-		m.data[unit.ID] = unit
-		m.dataName[unit.Name] = unit.ID
-
 	}
-	m.data[unit.ID] = unit
 	_, err := query.AvtUnit.Where(query.AvtUnit.ID.Eq(unit.ID)).Updates(map[string]interface{}{
 		"name":        unit.Name,
 		"address":     unit.Address,
@@ -103,4 +99,7 @@ func (m *UnitMap) Update(unit *model.AvtUnit) {
 		log.Println("avt_unit表数据更新错误：", err)
 		return
 	}
+	newUnit, _ := query.AvtUnit.Where(query.AvtUnit.ID.Eq(unit.ID)).Preload(query.AvtUnit.FileList,
+		query.AvtUnit.SubUnitList, query.AvtUnit.UserList).First()
+	m.data[unit.ID] = newUnit
 }
