@@ -12,7 +12,6 @@ const TableNameRelaUnitFile = "rela_unit_file"
 
 // RelaUnitFile mapped from table <rela_unit_file>
 type RelaUnitFile struct {
-	ID         int64     `gorm:"column:id;type:int;primaryKey;autoIncrement:true;comment:关系表id" json:"id,string"`
 	UnitID     int64     `gorm:"column:unit_id;type:int;not null;comment:单位ID" json:"unit_id"`
 	FileID     int64     `gorm:"column:file_id;type:int;not null;comment:文件id" json:"file_id"`
 	CreateTime time.Time `gorm:"column:create_time;type:datetime;not null;comment:创建时间" json:"create_time"`

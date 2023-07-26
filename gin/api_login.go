@@ -57,8 +57,8 @@ func CheckUser(user *utils.UserInfo) bool {
 	userPwd := sysUser.UserPwd
 	if logUserPwdMd5 == userPwd {
 		user.Prmiss.Expires = *sysUser.Expires
-		user.Prmiss.Level = sysUser.Level
 		user.Prmiss.UserID = sysUser.ID
+		user.Prmiss.UnitID = *sysUser.UnitID
 		return true
 	} else {
 		return false

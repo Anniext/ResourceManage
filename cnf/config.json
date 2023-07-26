@@ -2,7 +2,7 @@
     "mode": "dev",
     "dev": {
         "app_name": "ResourceManage",
-        "dsn": "root:123456@tcp(8.142.129.250:33060)/rema?charset=utf8&parseTime=true",
+        "dsn": "root:123456@tcp(127.0.0.1:3306)/zhjs?charset=utf8&parseTime=true",
         "router": {
             "host": "127.0.0.1:5500",
             "mode": "debug"

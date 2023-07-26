@@ -27,7 +27,6 @@ func newRelaUnitFile(db *gorm.DB, opts ...gen.DOOption) relaUnitFile {
 
 	tableName := _relaUnitFile.relaUnitFileDo.TableName()
 	_relaUnitFile.ALL = field.NewAsterisk(tableName)
-	_relaUnitFile.ID = field.NewInt64(tableName, "id")
 	_relaUnitFile.UnitID = field.NewInt64(tableName, "unit_id")
 	_relaUnitFile.FileID = field.NewInt64(tableName, "file_id")
 	_relaUnitFile.CreateTime = field.NewTime(tableName, "create_time")
@@ -42,7 +41,6 @@ type relaUnitFile struct {
 	relaUnitFileDo
 
 	ALL        field.Asterisk
-	ID         field.Int64 // 关系表id
 	UnitID     field.Int64 // 单位ID
 	FileID     field.Int64 // 文件id
 	CreateTime field.Time  // 创建时间
@@ -63,7 +61,6 @@ func (r relaUnitFile) As(alias string) *relaUnitFile {
 
 func (r *relaUnitFile) updateTableName(table string) *relaUnitFile {
 	r.ALL = field.NewAsterisk(table)
-	r.ID = field.NewInt64(table, "id")
 	r.UnitID = field.NewInt64(table, "unit_id")
 	r.FileID = field.NewInt64(table, "file_id")
 	r.CreateTime = field.NewTime(table, "create_time")
@@ -84,8 +81,7 @@ func (r *relaUnitFile) GetFieldByName(fieldName string) (field.OrderExpr, bool) 
 }
 
 func (r *relaUnitFile) fillFieldMap() {
-	r.fieldMap = make(map[string]field.Expr, 5)
-	r.fieldMap["id"] = r.ID
+	r.fieldMap = make(map[string]field.Expr, 4)
 	r.fieldMap["unit_id"] = r.UnitID
 	r.fieldMap["file_id"] = r.FileID
 	r.fieldMap["create_time"] = r.CreateTime

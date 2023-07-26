@@ -18,7 +18,7 @@ type UserInfo struct {
 }
 
 type Permissions struct {
-	Level   int64 `json:"level"`
+	UnitID  int64 `json:"unit_id"`
 	Expires int64 `json:"expires"`
 	UserID  int64 `json:"user_id"`
 }

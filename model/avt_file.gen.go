@@ -12,16 +12,16 @@ const TableNameAvtFile = "avt_file"
 
 // AvtFile mapped from table <avt_file>
 type AvtFile struct {
-	ID         int64     `gorm:"column:id;type:int;primaryKey;autoIncrement:true;comment:文件ID" json:"id,string"`
-	Name       string    `gorm:"column:name;type:varchar(20);not null;comment:文件名" json:"name"`
-	Size       int64     `gorm:"column:size;type:int;not null;comment:文件大小" json:"size"`
-	Type       string    `gorm:"column:type;type:varchar(50);not null;comment:文件类型" json:"type"`
-	FilePath   string    `gorm:"column:file_path;type:varchar(40);not null;comment:文件存储路径" json:"file_path"`
-	CreateTime time.Time `gorm:"column:create_time;type:datetime;not null;comment:创建时间" json:"create_time"`
-	UpdateTime time.Time `gorm:"column:update_time;type:datetime;not null;comment:修改时间" json:"update_time"`
-	IsDelete   int64     `gorm:"column:is_delete;type:int;not null;comment:删除标志\n1-删除\n0-未删除" json:"is_delete"`
-	Status     int64     `gorm:"column:status;type:int;not null;comment:文件状态" json:"status"`
-	File       string    `gorm:"column:file;type:varchar(50);not null;comment:文件全名" json:"file"`
+	ID         int64          `gorm:"column:id;type:int;primaryKey;autoIncrement:true;comment:文件ID" json:"id,string"`
+	Name       string         `gorm:"column:name;type:varchar(20);not null;comment:文件名" json:"name"`
+	Size       int64          `gorm:"column:size;type:int;not null;comment:文件大小" json:"size"`
+	Type       string         `gorm:"column:type;type:varchar(50);not null;comment:文件类型" json:"type"`
+	FilePath   string         `gorm:"column:file_path;type:varchar(40);not null;comment:文件存储路径" json:"file_path"`
+	CreateTime time.Time      `gorm:"column:create_time;type:datetime;not null;comment:创建时间" json:"create_time"`
+	UpdateTime time.Time      `gorm:"column:update_time;type:datetime;not null;comment:修改时间" json:"update_time"`
+	IsDelete   int64          `gorm:"column:is_delete;type:int;not null;comment:删除标志\n1-删除\n0-未删除" json:"is_delete"`
+	File       string         `gorm:"column:file;type:varchar(50);not null;comment:文件全名" json:"file"`
+	UnitList   []RelaUnitFile `gorm:"foreignKey:FileID" json:"unit_list"`
 }
 
 // TableName AvtFile's table name

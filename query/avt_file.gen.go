@@ -35,8 +35,12 @@ func newAvtFile(db *gorm.DB, opts ...gen.DOOption) avtFile {
 	_avtFile.CreateTime = field.NewTime(tableName, "create_time")
 	_avtFile.UpdateTime = field.NewTime(tableName, "update_time")
 	_avtFile.IsDelete = field.NewInt64(tableName, "is_delete")
-	_avtFile.Status = field.NewInt64(tableName, "status")
 	_avtFile.File = field.NewString(tableName, "file")
+	_avtFile.UnitList = avtFileHasManyUnitList{
+		db: db.Session(&gorm.Session{}),
+
+		RelationField: field.NewRelation("UnitList", "model.RelaUnitFile"),
+	}
 
 	_avtFile.fillFieldMap()
 
@@ -60,8 +64,8 @@ type avtFile struct {
 		0-未删除
 	*/
 	IsDelete field.Int64
-	Status   field.Int64  // 文件状态
 	File     field.String // 文件全名
+	UnitList avtFileHasManyUnitList
 
 	fieldMap map[string]field.Expr
 }
@@ -86,7 +90,6 @@ func (a *avtFile) updateTableName(table string) *avtFile {
 	a.CreateTime = field.NewTime(table, "create_time")
 	a.UpdateTime = field.NewTime(table, "update_time")
 	a.IsDelete = field.NewInt64(table, "is_delete")
-	a.Status = field.NewInt64(table, "status")
 	a.File = field.NewString(table, "file")
 
 	a.fillFieldMap()
@@ -113,8 +116,8 @@ func (a *avtFile) fillFieldMap() {
 	a.fieldMap["create_time"] = a.CreateTime
 	a.fieldMap["update_time"] = a.UpdateTime
 	a.fieldMap["is_delete"] = a.IsDelete
-	a.fieldMap["status"] = a.Status
 	a.fieldMap["file"] = a.File
+
 }
 
 func (a avtFile) clone(db *gorm.DB) avtFile {
@@ -125,6 +128,77 @@ func (a avtFile) clone(db *gorm.DB) avtFile {
 func (a avtFile) replaceDB(db *gorm.DB) avtFile {
 	a.avtFileDo.ReplaceDB(db)
 	return a
+}
+
+type avtFileHasManyUnitList struct {
+	db *gorm.DB
+
+	field.RelationField
+}
+
+func (a avtFileHasManyUnitList) Where(conds ...field.Expr) *avtFileHasManyUnitList {
+	if len(conds) == 0 {
+		return &a
+	}
+
+	exprs := make([]clause.Expression, 0, len(conds))
+	for _, cond := range conds {
+		exprs = append(exprs, cond.BeCond().(clause.Expression))
+	}
+	a.db = a.db.Clauses(clause.Where{Exprs: exprs})
+	return &a
+}
+
+func (a avtFileHasManyUnitList) WithContext(ctx context.Context) *avtFileHasManyUnitList {
+	a.db = a.db.WithContext(ctx)
+	return &a
+}
+
+func (a avtFileHasManyUnitList) Session(session *gorm.Session) *avtFileHasManyUnitList {
+	a.db = a.db.Session(session)
+	return &a
+}
+
+func (a avtFileHasManyUnitList) Model(m *model.AvtFile) *avtFileHasManyUnitListTx {
+	return &avtFileHasManyUnitListTx{a.db.Model(m).Association(a.Name())}
+}
+
+type avtFileHasManyUnitListTx struct{ tx *gorm.Association }
+
+func (a avtFileHasManyUnitListTx) Find() (result []*model.RelaUnitFile, err error) {
+	return result, a.tx.Find(&result)
+}
+
+func (a avtFileHasManyUnitListTx) Append(values ...*model.RelaUnitFile) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Append(targetValues...)
+}
+
+func (a avtFileHasManyUnitListTx) Replace(values ...*model.RelaUnitFile) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Replace(targetValues...)
+}
+
+func (a avtFileHasManyUnitListTx) Delete(values ...*model.RelaUnitFile) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Delete(targetValues...)
+}
+
+func (a avtFileHasManyUnitListTx) Clear() error {
+	return a.tx.Clear()
+}
+
+func (a avtFileHasManyUnitListTx) Count() int64 {
+	return a.tx.Count()
 }
 
 type avtFileDo struct{ gen.DO }

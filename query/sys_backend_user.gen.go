@@ -44,7 +44,7 @@ func newSysBackendUser(db *gorm.DB, opts ...gen.DOOption) sysBackendUser {
 	_sysBackendUser.Quota = field.NewString(tableName, "quota")
 	_sysBackendUser.KdxfLoginName = field.NewString(tableName, "kdxf_login_name")
 	_sysBackendUser.Expires = field.NewInt64(tableName, "expires")
-	_sysBackendUser.Level = field.NewInt64(tableName, "level")
+	_sysBackendUser.UnitID = field.NewInt64(tableName, "unit_id")
 
 	_sysBackendUser.fillFieldMap()
 
@@ -80,11 +80,7 @@ type sysBackendUser struct {
 		空为永久有效
 	*/
 	Expires field.Int64
-	/*
-		账号权限等级
-		0最高
-	*/
-	Level field.Int64
+	UnitID  field.Int64
 
 	fieldMap map[string]field.Expr
 }
@@ -118,7 +114,7 @@ func (s *sysBackendUser) updateTableName(table string) *sysBackendUser {
 	s.Quota = field.NewString(table, "quota")
 	s.KdxfLoginName = field.NewString(table, "kdxf_login_name")
 	s.Expires = field.NewInt64(table, "expires")
-	s.Level = field.NewInt64(table, "level")
+	s.UnitID = field.NewInt64(table, "unit_id")
 
 	s.fillFieldMap()
 
@@ -153,7 +149,7 @@ func (s *sysBackendUser) fillFieldMap() {
 	s.fieldMap["quota"] = s.Quota
 	s.fieldMap["kdxf_login_name"] = s.KdxfLoginName
 	s.fieldMap["expires"] = s.Expires
-	s.fieldMap["level"] = s.Level
+	s.fieldMap["unit_id"] = s.UnitID
 }
 
 func (s sysBackendUser) clone(db *gorm.DB) sysBackendUser {

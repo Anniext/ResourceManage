@@ -15,24 +15,24 @@ type BackendUserMap struct {
 func NewBackendUserMap() *BackendUserMap {
 	return &BackendUserMap{
 		data: make(map[string]*model.SysBackendUser),
-    }
+	}
 }
 
 func LoadBackendUserData() (err error) {
 	var userDataList []*model.SysBackendUser
 	err = query.SysBackendUser.Scan(&userDataList)
 	if err != nil {
-		log.Println("sys_backend_user表数据加载错误：", err)
+		log.Println("sys_backend_user Table Data Load Error：", err)
 		return err
 	}
 	count, _ := query.SysBackendUser.Count()
 	if count > 0 {
-		log.Println("sys_backend_user表缓存数据加载成功!")
+		log.Println("sys_backend_user Table Data Load Successful!")
 		for _, user := range userDataList {
 			CacheBackendUser.Set(user)
 		}
 	} else {
-		log.Println("sys_backend_user没有数据！")
+		log.Println("sys_backend_user Table not Data！")
 		return err
 	}
 	return nil
@@ -61,7 +61,6 @@ func (m *BackendUserMap) Update(user *model.SysBackendUser) {
 		"user_name": user.UserName,
 		"status":    user.Status,
 		"email":     user.Email,
-		"level":     user.Level,
 	})
 	if err != nil {
 		log.Println("avt_file表数据更新错误：", err)

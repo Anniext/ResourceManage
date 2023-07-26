@@ -29,7 +29,6 @@ func CreateFile(file *model.AvtFile) (bool, string) {
 	file.CreateTime = time.Now()
 	file.UpdateTime = time.Now()
 	file.IsDelete = 0
-	file.Status = 0
 	file.File = file.Name + "." + file.Type
 	id := CacheFile.GetID(file.Name)
 	if CacheFile.Get(id) != nil {
@@ -75,7 +74,6 @@ func UpdateFile(name string, file *model.AvtFile) (bool, string) {
 	existingFile.FilePath = file.FilePath
 	existingFile.UpdateTime = time.Now()
 	existingFile.IsDelete = file.IsDelete
-	existingFile.Status = file.Status
 	existingFile.File = name + "." + existingFile.Type
 	CacheFile.Update(existingFile)
 	return true, ""
@@ -125,7 +123,6 @@ func UploadFile(handler *multipart.FileHeader, f multipart.File, fileData *model
 	fileData.CreateTime = time.Now()
 	fileData.UpdateTime = time.Now()
 	fileData.IsDelete = 0
-	fileData.Status = 0
 	fileData.File = handler.Filename
 	CacheFile.Set(fileData)
 	err = CacheFile.Sync(fileData)

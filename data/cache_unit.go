@@ -20,21 +20,21 @@ func NewUnitMap() *UnitMap {
 	}
 }
 
-func LoadUnitData() (err error) {
-	var unitDataList []*model.AvtUnit
-	err = query.AvtUnit.Scan(&unitDataList)
+func LoadUnitData() error {
+	unitDataList, err := query.AvtUnit.Preload(query.AvtUnit.FileList, query.AvtUnit.SubUnitList,
+		query.AvtUnit.UserList).Find()
 	if err != nil {
-		log.Println("avt_unit表数据加载错误：", err)
+		log.Println("avt_unit Table Data Load Error：", err)
 		return err
 	}
 	count, _ := query.AvtFile.Count()
 	if count > 0 {
-		log.Println("avt_unit表缓存数据加载成功!")
+		log.Println("avt_unit Table Data Load Successful!")
 		for _, unit := range unitDataList {
 			CacheUnit.Set(unit)
 		}
 	} else {
-		log.Println("avt_unit没有数据！")
+		log.Println("avt_unit Table not Data！")
 		return err
 	}
 	return nil
@@ -43,7 +43,7 @@ func LoadUnitData() (err error) {
 func (m *UnitMap) Set(bu *model.AvtUnit) {
 	m.lock.Lock()
 	m.data[bu.ID] = bu
-    m.dataName[bu.Name] = bu.ID
+	m.dataName[bu.Name] = bu.ID
 	m.lock.Unlock()
 }
 
@@ -54,9 +54,9 @@ func (m *UnitMap) Get(id int64) *model.AvtUnit {
 }
 
 func (m *UnitMap) GetID(name string) int64 {
-    m.lock.RLock()
-    defer m.lock.RUnlock()
-    return m.dataName[name]
+	m.lock.RLock()
+	defer m.lock.RUnlock()
+	return m.dataName[name]
 }
 
 func (m *UnitMap) Delete(id int64) {
@@ -80,7 +80,7 @@ func (m *UnitMap) Clear() {
 	m.lock.Lock()
 	defer m.lock.Unlock()
 	m.data = make(map[int64]*model.AvtUnit)
-    m.dataName = make(map[string]int64)
+	m.dataName = make(map[string]int64)
 }
 
 func (m *UnitMap) Update(unit *model.AvtUnit) {
@@ -88,10 +88,10 @@ func (m *UnitMap) Update(unit *model.AvtUnit) {
 	defer m.lock.Unlock()
 	if _, ok := m.data[unit.ID]; ok {
 		delete(m.data, unit.ID)
-        delete(m.dataName, unit.Name)
+		delete(m.dataName, unit.Name)
 		m.data[unit.ID] = unit
-        m.dataName[unit.Name] = unit.ID
-        
+		m.dataName[unit.Name] = unit.ID
+
 	}
 	m.data[unit.ID] = unit
 	_, err := query.AvtUnit.Where(query.AvtUnit.ID.Eq(unit.ID)).Updates(map[string]interface{}{

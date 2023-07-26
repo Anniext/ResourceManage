@@ -32,9 +32,64 @@ func newAvtUnit(db *gorm.DB, opts ...gen.DOOption) avtUnit {
 	_avtUnit.Level = field.NewInt64(tableName, "level")
 	_avtUnit.CreateTime = field.NewTime(tableName, "create_time")
 	_avtUnit.UpdateTime = field.NewTime(tableName, "update_time")
-	_avtUnit.ParentID = field.NewInt64(tableName, "parent_id")
 	_avtUnit.Address = field.NewString(tableName, "address")
-	_avtUnit.UserID = field.NewInt64(tableName, "user_id")
+	_avtUnit.ParentID = field.NewInt64(tableName, "parent_id")
+	_avtUnit.FileList = avtUnitHasManyFileList{
+		db: db.Session(&gorm.Session{}),
+
+		RelationField: field.NewRelation("FileList", "model.RelaUnitFile"),
+	}
+
+	_avtUnit.UserList = avtUnitHasManyUserList{
+		db: db.Session(&gorm.Session{}),
+
+		RelationField: field.NewRelation("UserList", "model.SysBackendUser"),
+	}
+
+	_avtUnit.SubUnitList = avtUnitHasManySubUnitList{
+		db: db.Session(&gorm.Session{}),
+
+		RelationField: field.NewRelation("SubUnitList", "model.AvtUnit"),
+		FileList: struct {
+			field.RelationField
+		}{
+			RelationField: field.NewRelation("SubUnitList.FileList", "model.RelaUnitFile"),
+		},
+		UserList: struct {
+			field.RelationField
+		}{
+			RelationField: field.NewRelation("SubUnitList.UserList", "model.SysBackendUser"),
+		},
+		SubUnitList: struct {
+			field.RelationField
+			FileList struct {
+				field.RelationField
+			}
+			UserList struct {
+				field.RelationField
+			}
+			SubUnitList struct {
+				field.RelationField
+			}
+		}{
+			RelationField: field.NewRelation("SubUnitList.SubUnitList", "model.AvtUnit"),
+			FileList: struct {
+				field.RelationField
+			}{
+				RelationField: field.NewRelation("SubUnitList.SubUnitList.FileList", "model.RelaUnitFile"),
+			},
+			UserList: struct {
+				field.RelationField
+			}{
+				RelationField: field.NewRelation("SubUnitList.SubUnitList.UserList", "model.SysBackendUser"),
+			},
+			SubUnitList: struct {
+				field.RelationField
+			}{
+				RelationField: field.NewRelation("SubUnitList.SubUnitList.SubUnitList", "model.AvtUnit"),
+			},
+		},
+	}
 
 	_avtUnit.fillFieldMap()
 
@@ -50,9 +105,13 @@ type avtUnit struct {
 	Level      field.Int64  // 单位级别
 	CreateTime field.Time   // 创建时间
 	UpdateTime field.Time   // 更新时间
-	ParentID   field.Int64  // 上级单位id
 	Address    field.String // 单位地址
-	UserID     field.Int64  // 用户id
+	ParentID   field.Int64
+	FileList   avtUnitHasManyFileList
+
+	UserList avtUnitHasManyUserList
+
+	SubUnitList avtUnitHasManySubUnitList
 
 	fieldMap map[string]field.Expr
 }
@@ -74,9 +133,8 @@ func (a *avtUnit) updateTableName(table string) *avtUnit {
 	a.Level = field.NewInt64(table, "level")
 	a.CreateTime = field.NewTime(table, "create_time")
 	a.UpdateTime = field.NewTime(table, "update_time")
-	a.ParentID = field.NewInt64(table, "parent_id")
 	a.Address = field.NewString(table, "address")
-	a.UserID = field.NewInt64(table, "user_id")
+	a.ParentID = field.NewInt64(table, "parent_id")
 
 	a.fillFieldMap()
 
@@ -93,15 +151,15 @@ func (a *avtUnit) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (a *avtUnit) fillFieldMap() {
-	a.fieldMap = make(map[string]field.Expr, 8)
+	a.fieldMap = make(map[string]field.Expr, 10)
 	a.fieldMap["id"] = a.ID
 	a.fieldMap["name"] = a.Name
 	a.fieldMap["level"] = a.Level
 	a.fieldMap["create_time"] = a.CreateTime
 	a.fieldMap["update_time"] = a.UpdateTime
-	a.fieldMap["parent_id"] = a.ParentID
 	a.fieldMap["address"] = a.Address
-	a.fieldMap["user_id"] = a.UserID
+	a.fieldMap["parent_id"] = a.ParentID
+
 }
 
 func (a avtUnit) clone(db *gorm.DB) avtUnit {
@@ -112,6 +170,238 @@ func (a avtUnit) clone(db *gorm.DB) avtUnit {
 func (a avtUnit) replaceDB(db *gorm.DB) avtUnit {
 	a.avtUnitDo.ReplaceDB(db)
 	return a
+}
+
+type avtUnitHasManyFileList struct {
+	db *gorm.DB
+
+	field.RelationField
+}
+
+func (a avtUnitHasManyFileList) Where(conds ...field.Expr) *avtUnitHasManyFileList {
+	if len(conds) == 0 {
+		return &a
+	}
+
+	exprs := make([]clause.Expression, 0, len(conds))
+	for _, cond := range conds {
+		exprs = append(exprs, cond.BeCond().(clause.Expression))
+	}
+	a.db = a.db.Clauses(clause.Where{Exprs: exprs})
+	return &a
+}
+
+func (a avtUnitHasManyFileList) WithContext(ctx context.Context) *avtUnitHasManyFileList {
+	a.db = a.db.WithContext(ctx)
+	return &a
+}
+
+func (a avtUnitHasManyFileList) Session(session *gorm.Session) *avtUnitHasManyFileList {
+	a.db = a.db.Session(session)
+	return &a
+}
+
+func (a avtUnitHasManyFileList) Model(m *model.AvtUnit) *avtUnitHasManyFileListTx {
+	return &avtUnitHasManyFileListTx{a.db.Model(m).Association(a.Name())}
+}
+
+type avtUnitHasManyFileListTx struct{ tx *gorm.Association }
+
+func (a avtUnitHasManyFileListTx) Find() (result []*model.RelaUnitFile, err error) {
+	return result, a.tx.Find(&result)
+}
+
+func (a avtUnitHasManyFileListTx) Append(values ...*model.RelaUnitFile) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Append(targetValues...)
+}
+
+func (a avtUnitHasManyFileListTx) Replace(values ...*model.RelaUnitFile) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Replace(targetValues...)
+}
+
+func (a avtUnitHasManyFileListTx) Delete(values ...*model.RelaUnitFile) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Delete(targetValues...)
+}
+
+func (a avtUnitHasManyFileListTx) Clear() error {
+	return a.tx.Clear()
+}
+
+func (a avtUnitHasManyFileListTx) Count() int64 {
+	return a.tx.Count()
+}
+
+type avtUnitHasManyUserList struct {
+	db *gorm.DB
+
+	field.RelationField
+}
+
+func (a avtUnitHasManyUserList) Where(conds ...field.Expr) *avtUnitHasManyUserList {
+	if len(conds) == 0 {
+		return &a
+	}
+
+	exprs := make([]clause.Expression, 0, len(conds))
+	for _, cond := range conds {
+		exprs = append(exprs, cond.BeCond().(clause.Expression))
+	}
+	a.db = a.db.Clauses(clause.Where{Exprs: exprs})
+	return &a
+}
+
+func (a avtUnitHasManyUserList) WithContext(ctx context.Context) *avtUnitHasManyUserList {
+	a.db = a.db.WithContext(ctx)
+	return &a
+}
+
+func (a avtUnitHasManyUserList) Session(session *gorm.Session) *avtUnitHasManyUserList {
+	a.db = a.db.Session(session)
+	return &a
+}
+
+func (a avtUnitHasManyUserList) Model(m *model.AvtUnit) *avtUnitHasManyUserListTx {
+	return &avtUnitHasManyUserListTx{a.db.Model(m).Association(a.Name())}
+}
+
+type avtUnitHasManyUserListTx struct{ tx *gorm.Association }
+
+func (a avtUnitHasManyUserListTx) Find() (result []*model.SysBackendUser, err error) {
+	return result, a.tx.Find(&result)
+}
+
+func (a avtUnitHasManyUserListTx) Append(values ...*model.SysBackendUser) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Append(targetValues...)
+}
+
+func (a avtUnitHasManyUserListTx) Replace(values ...*model.SysBackendUser) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Replace(targetValues...)
+}
+
+func (a avtUnitHasManyUserListTx) Delete(values ...*model.SysBackendUser) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Delete(targetValues...)
+}
+
+func (a avtUnitHasManyUserListTx) Clear() error {
+	return a.tx.Clear()
+}
+
+func (a avtUnitHasManyUserListTx) Count() int64 {
+	return a.tx.Count()
+}
+
+type avtUnitHasManySubUnitList struct {
+	db *gorm.DB
+
+	field.RelationField
+
+	FileList struct {
+		field.RelationField
+	}
+	UserList struct {
+		field.RelationField
+	}
+	SubUnitList struct {
+		field.RelationField
+		FileList struct {
+			field.RelationField
+		}
+		UserList struct {
+			field.RelationField
+		}
+		SubUnitList struct {
+			field.RelationField
+		}
+	}
+}
+
+func (a avtUnitHasManySubUnitList) Where(conds ...field.Expr) *avtUnitHasManySubUnitList {
+	if len(conds) == 0 {
+		return &a
+	}
+
+	exprs := make([]clause.Expression, 0, len(conds))
+	for _, cond := range conds {
+		exprs = append(exprs, cond.BeCond().(clause.Expression))
+	}
+	a.db = a.db.Clauses(clause.Where{Exprs: exprs})
+	return &a
+}
+
+func (a avtUnitHasManySubUnitList) WithContext(ctx context.Context) *avtUnitHasManySubUnitList {
+	a.db = a.db.WithContext(ctx)
+	return &a
+}
+
+func (a avtUnitHasManySubUnitList) Session(session *gorm.Session) *avtUnitHasManySubUnitList {
+	a.db = a.db.Session(session)
+	return &a
+}
+
+func (a avtUnitHasManySubUnitList) Model(m *model.AvtUnit) *avtUnitHasManySubUnitListTx {
+	return &avtUnitHasManySubUnitListTx{a.db.Model(m).Association(a.Name())}
+}
+
+type avtUnitHasManySubUnitListTx struct{ tx *gorm.Association }
+
+func (a avtUnitHasManySubUnitListTx) Find() (result []*model.AvtUnit, err error) {
+	return result, a.tx.Find(&result)
+}
+
+func (a avtUnitHasManySubUnitListTx) Append(values ...*model.AvtUnit) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Append(targetValues...)
+}
+
+func (a avtUnitHasManySubUnitListTx) Replace(values ...*model.AvtUnit) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Replace(targetValues...)
+}
+
+func (a avtUnitHasManySubUnitListTx) Delete(values ...*model.AvtUnit) (err error) {
+	targetValues := make([]interface{}, len(values))
+	for i, v := range values {
+		targetValues[i] = v
+	}
+	return a.tx.Delete(targetValues...)
+}
+
+func (a avtUnitHasManySubUnitListTx) Clear() error {
+	return a.tx.Clear()
+}
+
+func (a avtUnitHasManySubUnitListTx) Count() int64 {
+	return a.tx.Count()
 }
 
 type avtUnitDo struct{ gen.DO }

@@ -36,7 +36,6 @@ func UpdateUser(name string, user *model.SysBackendUser, db *gorm.DB) string {
 	existingUser.UserName = user.UserName
 	existingUser.Status = user.Status
 	existingUser.Email = user.Email
-	existingUser.Level = user.Level
 	CacheBackendUser.Update(existingUser)
 	return ""
 
